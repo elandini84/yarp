@@ -37,7 +37,8 @@ FrameTransformGet_nws_ros::FrameTransformGet_nws_ros(double tperiod) :
 PeriodicThread(tperiod),
 m_nodeName(ROSNODENAME),
 m_topic(ROSTOPICNAME_TF),
-m_rosNode(nullptr)
+m_rosNode(nullptr),
+m_iGetIf(nullptr)
 {
 }
 
@@ -99,41 +100,34 @@ void FrameTransformGet_nws_ros::run()
 {
     std::lock_guard <std::mutex> lg(m_pd_mutex);
     std::vector<yarp::math::FrameTransform> tempTfs;
-    for (size_t i = 0; i < iGetIf.size(); i++)
+    tempTfs.clear();
+    yCInfo(FRAMETRANSFORGETNWSROS, "Implement me");
+    if(!m_iGetIf->getTransforms(tempTfs))
     {
-        tempTfs.clear();
-        yCInfo(FRAMETRANSFORGETNWSROS, "Implement me");
-        if(!iGetIf[i]->getTransforms(tempTfs))
-        {
-            yCError(FRAMETRANSFORGETNWSROS,"Unable to get the transform vector)");
-        }
-        publishFrameTransforms(tempTfs);
+        yCError(FRAMETRANSFORGETNWSROS,"Unable to get the transform vector)");
     }
+    publishFrameTransforms(tempTfs);
 }
 
-bool FrameTransformGet_nws_ros::detachAll()
+bool FrameTransformGet_nws_ros::detach()
 {
     std::lock_guard <std::mutex> lg(m_pd_mutex);
-    iGetIf.clear();
-
+    m_iGetIf = nullptr;
     return true;
 }
 
-bool FrameTransformGet_nws_ros::attachAll(const yarp::dev::PolyDriverList& device2attach)
+bool FrameTransformGet_nws_ros::attach(yarp::dev::PolyDriver* device2attach)
 {
     std::lock_guard <std::mutex> lg(m_pd_mutex);
-    pDriverList = device2attach;
+    m_pDriver = device2attach;
 
-    for (size_t i = 0; i < pDriverList.size(); i++)
+    if (m_pDriver->isValid())
     {
-        yarp::dev::PolyDriver* pd = pDriverList[i]->poly;
-        if (pd->isValid())
+        IFrameTransformStorageGet* pp=nullptr;
+        if (!m_pDriver->view(m_iGetIf) || m_iGetIf==nullptr)
         {
-            IFrameTransformStorageGet* pp=nullptr;
-            if (pd->view(pp) && pp!=nullptr)
-            {
-                iGetIf.push_back(pp);
-            }
+            yCError(FRAMETRANSFORGETNWSROS, "Attach failed");
+            return false;
         }
     }
     return true;

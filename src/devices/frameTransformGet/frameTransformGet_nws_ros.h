@@ -25,7 +25,7 @@
 #include <yarp/sig/Vector.h>
 #include <yarp/os/PeriodicThread.h>
 #include <yarp/dev/PolyDriver.h>
-#include <yarp/dev/IMultipleWrapper.h>
+#include <yarp/dev/WrapperSingle.h>
 #include <yarp/os/Publisher.h>
 #include <yarp/os/Subscriber.h>
 #include <yarp/os/Node.h>
@@ -43,11 +43,11 @@
 class FrameTransformGet_nws_ros :
     public yarp::dev::DeviceDriver,
     public yarp::os::PeriodicThread,
-    public yarp::dev::IMultipleWrapper
+    public yarp::dev::WrapperSingle
 {
 private:
     std::vector<yarp::math::FrameTransform> m_transforms;
-    mutable std::mutex  m_trf_mutex;
+    mutable std::mutex                      m_trf_mutex;
 
 public:
     FrameTransformGet_nws_ros(double tperiod=0.010);
@@ -58,8 +58,8 @@ public:
     bool close() override;
 
     //wrapper and interfaces
-    bool attachAll(const yarp::dev::PolyDriverList& p) override;
-    bool detachAll() override;
+    bool attach(yarp::dev::PolyDriver* device2attach) override;
+    bool detach() override;
 
     //periodicThread
     void     run() override;
@@ -73,8 +73,8 @@ private:
     std::string                                            m_nodeName;
     std::string                                            m_topic;
     double                                                 m_period;
-    yarp::dev::PolyDriverList                              pDriverList;
-    std::vector<yarp::dev::IFrameTransformStorageGet*>     iGetIf;
+    yarp::dev::PolyDriver*                                 m_pDriver;
+    yarp::dev::IFrameTransformStorageGet*                  m_iGetIf;
     yarp::os::Node*                                        m_rosNode;
     yarp::os::Publisher<yarp::rosmsg::tf2_msgs::TFMessage> m_rosPublisherPort_tf;
 };
