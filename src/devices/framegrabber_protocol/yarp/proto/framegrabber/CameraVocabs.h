@@ -18,12 +18,14 @@
  */
 constexpr yarp::conf::vocab32_t VOCAB_FRAMEGRABBER_IMAGE        = yarp::os::createVocab('f','g','i');
 constexpr yarp::conf::vocab32_t VOCAB_FRAMEGRABBER_IMAGERAW     = yarp::os::createVocab('f','g','i','r');
-
+constexpr yarp::conf::vocab32_t VOCAB_RGB_VISUAL_PARAMS         = yarp::os::createVocab('v','i','s','r');
+constexpr yarp::conf::vocab32_t VOCAB_DEPTH_VISUAL_PARAMS       = yarp::os::createVocab('v','i','s','d');
+constexpr yarp::conf::vocab32_t VOCAB_RGBD_SENSOR               = yarp::os::createVocab('r','g','d','b');
+constexpr yarp::conf::vocab32_t VOCAB_RGBD_PROTOCOL_VERSION     = yarp::os::createVocab('p','r','o','t');
 
 /*
  * Generic capabilities defines
  */
-
 constexpr yarp::conf::vocab32_t VOCAB_BRIGHTNESS                = yarp::os::createVocab('b','r','i');
 constexpr yarp::conf::vocab32_t VOCAB_EXPOSURE                  = yarp::os::createVocab('e','x','p','o');
 constexpr yarp::conf::vocab32_t VOCAB_SHARPNESS                 = yarp::os::createVocab('s','h','a','r');
@@ -100,65 +102,27 @@ constexpr yarp::conf::vocab32_t VOCAB_DRSETBPP = yarp::os::createVocab('D','R','
 constexpr yarp::conf::vocab32_t VOCAB_DRGETBPP = yarp::os::createVocab('D','R','2','O'); // 40
 
 
+// Rgb and depth
+constexpr yarp::conf::vocab32_t VOCAB_RGB               = yarp::os::createVocab('r','g','b');
+constexpr yarp::conf::vocab32_t VOCAB_DEPTH             = yarp::os::createVocab('d','e','p','t');
+constexpr yarp::conf::vocab32_t VOCAB_MIRROR            = yarp::os::createVocab('m','i','r','r');
 
-#if 0
-    cameraFeature_id_t featureVOCABEnum(int vocab)
-    {
-        switch (vocab) {
-        case VOCAB_BRIGHTNESS:
-            return YARP_FEATURE_BRIGHTNESS;
-        case VOCAB_EXPOSURE:
-            return YARP_FEATURE_EXPOSURE;
-        case VOCAB_SHARPNESS:
-            return YARP_FEATURE_SHARPNESS;
-        case VOCAB_WHITE:
-            return YARP_FEATURE_WHITE_BALANCE;
-        case VOCAB_HUE:
-            return YARP_FEATURE_HUE;
-        case VOCAB_SATURATION:
-            return YARP_FEATURE_SATURATION;
-        case VOCAB_GAMMA:
-            return YARP_FEATURE_GAMMA;
-        case VOCAB_SHUTTER:
-            return YARP_FEATURE_SHUTTER;
-        case VOCAB_GAIN:
-            return YARP_FEATURE_GAIN;
-        case VOCAB_IRIS:
-            return YARP_FEATURE_IRIS;
-        default:
-            return YARP_FEATURE_INVALID;
-        }
+// Methods
+constexpr yarp::conf::vocab32_t VOCAB_RESOLUTION        = yarp::os::createVocab('r','e','s');
+constexpr yarp::conf::vocab32_t VOCAB_FOV               = yarp::os::createVocab('f','o','v');
+constexpr yarp::conf::vocab32_t VOCAB_INTRINSIC_PARAM   = yarp::os::createVocab('i','n','t','p');
+constexpr yarp::conf::vocab32_t VOCAB_SUPPORTED_CONF    = yarp::os::createVocab('c','o','n','f');
 
-    }
+// Depth only
+constexpr yarp::conf::vocab32_t VOCAB_ACCURACY          = yarp::os::createVocab('a','c','r','c');
+constexpr yarp::conf::vocab32_t VOCAB_CLIP_PLANES       = yarp::os::createVocab('c','l','i','p');
 
-    int featureEnum2Vocab(cameraFeature_id_t _enum)
-    {
-        switch (_enum) {
-        case YARP_FEATURE_BRIGHTNESS:
-            return VOCAB_BRIGHTNESS;
-        case YARP_FEATURE_EXPOSURE:
-            return VOCAB_EXPOSURE;
-        case YARP_FEATURE_SHARPNESS:
-            return VOCAB_SHARPNESS;
-        case YARP_FEATURE_WHITE_BALANCE:
-            return VOCAB_WHITE;
-        case YARP_FEATURE_HUE:
-            return VOCAB_HUE;
-        case YARP_FEATURE_SATURATION:
-            return VOCAB_SATURATION;
-        case YARP_FEATURE_GAMMA:
-            return VOCAB_GAMMA;
-        case YARP_FEATURE_SHUTTER:
-            return VOCAB_SHUTTER;
-        case YARP_FEATURE_GAIN:
-            return VOCAB_GAIN;
-        case YARP_FEATURE_IRIS:
-            return VOCAB_IRIS;
-        default:
-            return -1;
-        }
-
-    }
-#endif
+// IRGBDSensor Methods
+constexpr yarp::conf::vocab32_t VOCAB_EXTRINSIC_PARAM   = yarp::os::createVocab('e','x','t');
+constexpr yarp::conf::vocab32_t VOCAB_ERROR_MSG         = yarp::os::createVocab('m','e','s','s');
+constexpr yarp::conf::vocab32_t VOCAB_RGB_IMAGE         = yarp::os::createVocab('i','m','g','r');
+constexpr yarp::conf::vocab32_t VOCAB_DEPTH_IMAGE       = yarp::os::createVocab('i','m','g','d');
+constexpr yarp::conf::vocab32_t VOCAB_IMAGES            = yarp::os::createVocab('i','m','m','s');
+constexpr yarp::conf::vocab32_t VOCAB_STATUS            = yarp::os::createVocab('s','t','a','t');
 
 #endif // YARP_FRAMEGRABBER_PROTOCOL_CAMERAVOCABS_H
