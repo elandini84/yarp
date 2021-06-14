@@ -1,0 +1,75 @@
+# Copyright (C) 2006-2021 Istituto Italiano di Tecnologia (IIT)
+# All rights reserved.
+#
+# This software may be modified and distributed under the terms of the
+# BSD-3-Clause license. See the accompanying LICENSE file for details.
+
+# NWS ----------------------------------------------------------------------------------------------------- #
+yarp_prepare_plugin(frameTransformGet_nws_ros
+                    CATEGORY device
+                    TYPE FrameTransformGet_nws_ros
+                    INCLUDE frameTransformGet_nws_ros.h
+                    DEPENDS "TARGET YARP::YARP_math"
+                    DEFAULT ON)
+
+if(NOT SKIP_frameTransformGet_nws_ros)
+  yarp_add_plugin(yarp_frameTransformGet_nws_ros)
+
+  target_sources(yarp_frameTransformGet_nws_ros PRIVATE frameTransformGet_nws_ros.cpp
+                                                        frameTransformGet_nws_ros.h)
+
+  target_link_libraries(yarp_frameTransformGet_nws_ros PRIVATE YARP::YARP_os
+                                                               YARP::YARP_sig
+                                                               YARP::YARP_dev
+                                                               YARP::YARP_math
+                                                               YARP::YARP_rosmsg)
+  list(APPEND YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS YARP_os
+                                                      YARP_sig
+                                                      YARP_dev
+                                                      YARP_math
+                                                      YARP_rosmsg)
+
+  yarp_install(TARGETS yarp_frameTransformGet_nws_ros
+               EXPORT YARP_${YARP_PLUGIN_MASTER}
+               COMPONENT ${YARP_PLUGIN_MASTER}
+               LIBRARY DESTINATION ${YARP_DYNAMIC_PLUGINS_INSTALL_DIR}
+               ARCHIVE DESTINATION ${YARP_STATIC_PLUGINS_INSTALL_DIR}
+               YARP_INI DESTINATION ${YARP_PLUGIN_MANIFESTS_INSTALL_DIR})
+
+  set(YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS ${YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS} PARENT_SCOPE)
+
+  set_property(TARGET yarp_frameTransformGet_nws_ros PROPERTY FOLDER "Plugins/Device")
+endif()
+
+#[[
+# NWC ----------------------------------------------------------------------------------------------------- #
+yarp_prepare_plugin(frameTransformGet_nwc_ros
+        CATEGORY device
+        TYPE FrameTransformGet_nwc_ros
+        INCLUDE frameTransformGet_nwc_ros.h
+        DEFAULT ON)
+
+if(NOT SKIP_frameTransformGet_nwc_ros)
+  yarp_add_plugin(yarp_frameTransformGet_nwc_ros)
+
+  target_sources(yarp_frameTransformGet_nwc_ros PRIVATE frameTransformGet_nwc_ros.cpp
+          frameTransformGet_nwc_ros.h)
+
+  target_link_libraries(yarp_frameTransformGet_nwc_ros PRIVATE YARP::YARP_os
+          YARP::YARP_sig
+          YARP::YARP_dev)
+  list(APPEND YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS YARP_os
+          YARP_sig
+          YARP_dev)
+
+  yarp_install(TARGETS yarp_frameTransformGet_nwc_ros
+          EXPORT YARP_${YARP_PLUGIN_MASTER}
+          COMPONENT ${YARP_PLUGIN_MASTER}
+          LIBRARY DESTINATION ${YARP_DYNAMIC_PLUGINS_INSTALL_DIR}
+          ARCHIVE DESTINATION ${YARP_STATIC_PLUGINS_INSTALL_DIR}
+          YARP_INI DESTINATION ${YARP_PLUGIN_MANIFESTS_INSTALL_DIR})
+
+  set(YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS ${YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS} PARENT_SCOPE)
+
+  set_property(TARGET yarp_frameTransformGet_nwc_ros PROPERTY FOLDER "Plugins/Device")
+endif()]]
