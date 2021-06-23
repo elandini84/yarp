@@ -20,7 +20,8 @@ foreach(example_name attachable
                      grabber_client
                      grabber_crop
                      motortest
-                     RGBD)
+                     RGBD
+                     simpleFtClient)
 
   if(YARP_COMPILE_EXAMPLES)
     add_subdirectory(${example_name})
