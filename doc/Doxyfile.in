@@ -1288,7 +1288,19 @@ HTML_STYLESHEET        =
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = @CMAKE_SOURCE_DIR@/doc/yarp-doxygen-style.css
+#HTML_EXTRA_STYLESHEET  = @CMAKE_SOURCE_DIR@/doc/yarp-doxygen-style.css
+# Test doxygen-awesome # TEST START ################################################################
+# Doxyfile
+ 
+# Include the required Javascript
+GENERATE_TREEVIEW      = YES
+#HTML_EXTRA_FILES       = @CMAKE_SOURCE_DIR@/doc/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js
+ 
+# Add the additional CSS. This is ONLY required for the sidebar-only theme variant!
+HTML_EXTRA_STYLESHEET  = @CMAKE_SOURCE_DIR@/doc/doxygen-awesome-css/doxygen-awesome.css 
+                         #@CMAKE_SOURCE_DIR@/doc/doxygen-awesome-css/doxygen-awesome-sidebar-only.css \
+                         #@CMAKE_SOURCE_DIR@/doc/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css
+# TEST END #########################################################################################
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1301,7 +1313,8 @@ HTML_EXTRA_STYLESHEET  = @CMAKE_SOURCE_DIR@/doc/yarp-doxygen-style.css
 HTML_EXTRA_FILES       = @CMAKE_SOURCE_DIR@/doc/images/yarp-favicon.ico \
                          @CMAKE_SOURCE_DIR@/doc/moonhouse.ttf \
                          @CMAKE_SOURCE_DIR@/doc/cookieconsent_3_0_3/cookieconsent.min.js \
-                         @CMAKE_SOURCE_DIR@/doc/cookieconsent_3_0_3/cookieconsent.min.css
+                         @CMAKE_SOURCE_DIR@/doc/cookieconsent_3_0_3/cookieconsent.min.css \
+                         @CMAKE_SOURCE_DIR@/doc/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -2573,7 +2586,11 @@ DIRECTORY_GRAPH        = YES
 # The default value is: png.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_IMAGE_FORMAT       = png
+#DOT_IMAGE_FORMAT       = png
+# TEST doxygen-awesome ## TEST START ###########################################
+DOT_IMAGE_FORMAT       = svg
+######################### TEST END   ###########################################
+
 
 # If DOT_IMAGE_FORMAT is set to svg, then this option can be set to YES to
 # enable generation of interactive SVG images that allow zooming and panning.
@@ -2691,3 +2708,4 @@ GENERATE_LEGEND        = YES
 # The default value is: YES.
 
 DOT_CLEANUP            = YES
+
