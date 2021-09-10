@@ -39,9 +39,13 @@ if(NOT SKIP_frameTransformClient)
     WHENCE robotinterface_xml
     PREFIX config_xml
     robotinterface_xml/ftc_full_ros.xml
+    robotinterface_xml/ftc_full_ros2.xml
     robotinterface_xml/ftc_pub_ros.xml
+    robotinterface_xml/ftc_pub_ros2.xml
     robotinterface_xml/ftc_ros.xml
+    robotinterface_xml/ftc_ros2.xml
     robotinterface_xml/ftc_sub_ros.xml
+    robotinterface_xml/ftc_sub_ros2.xml
     robotinterface_xml/ftc_pub_yarp_only.xml
     robotinterface_xml/ftc_sub_yarp_only.xml
     robotinterface_xml/ftc_yarp_only.xml

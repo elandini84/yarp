@@ -8,6 +8,7 @@ cmrc_add_resource_library(frameTransformServerRC
                           WHENCE robotinterface_xml
                           PREFIX config_xml
                           robotinterface_xml/fts_full_ros.xml
+                          robotinterface_xml/fts_full_ros2.xml
                           robotinterface_xml/fts_yarp_only.xml)
 
 yarp_prepare_plugin(frameTransformServer
