@@ -1,0 +1,17 @@
+/*
+ * SPDX-FileCopyrightText: 2006-2021 Istituto Italiano di Tecnologia (IIT)
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+namespace yarp yarp.dev
+
+struct ClockData
+{
+    1: i32 sec;
+    2: i32 nsec;
+}
+
+service ClockRPC
+{
+    ClockData getClock();
+}
