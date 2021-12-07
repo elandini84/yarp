@@ -20,6 +20,8 @@ PeriodicThread(default_period)
     yCTrace(FAKECLOCK);
 }
 
+FakeClock::~FakeClock() = default;
+
 
 bool FakeClock::threadInit()
 {
@@ -39,6 +41,16 @@ void FakeClock::run()
 
 void FakeClock::threadRelease()
 {
+}
+
+
+yarp::dev::ClockData FakeClock::convertTime(double input)
+{
+    yarp::dev::ClockData converted;
+    converted.sec = static_cast<int>(input);
+    converted.nsec = static_cast<int>((input-static_cast<double>(converted.sec))*1000000000);
+
+    return converted;
 }
 
 

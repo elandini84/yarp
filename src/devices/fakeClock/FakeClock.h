@@ -58,13 +58,14 @@ class FakeClock :
 {
 public:
     FakeClock();
+    ~FakeClock() override;
 
     yarp::dev::ClockData convertTime(double input);
 
     // PeriodicThread
-    virtual bool threadInit() override;
-    virtual void threadRelease() override;
-    virtual void run() override;
+    bool threadInit() override;
+    void threadRelease() override;
+    void run() override;
 
     // DeviceDriver
     bool open(yarp::os::Searchable& config) override;

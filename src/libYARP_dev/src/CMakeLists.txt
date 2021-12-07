@@ -40,6 +40,7 @@ set(YARP_dev_HDRS
   yarp/dev/IAxisInfo.h
   yarp/dev/IBattery.h
   yarp/dev/ICalibrator.h
+  yarp/dev/IClock.h
   yarp/dev/IControlCalibration.h
   yarp/dev/IControlDebug.h
   yarp/dev/IControlLimits.h
