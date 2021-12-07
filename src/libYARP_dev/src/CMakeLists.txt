@@ -267,6 +267,7 @@ set(YARP_dev_IDL
   idl/MobileBaseVelocity.thrift
   idl/AudioPlayerStatus.thrift
   idl/AudioRecorderStatus.thrift
+  idl/Clock.thrift
 )
 
 if(TARGET YARP::YARP_math)

@@ -9,9 +9,15 @@ struct ClockData
 {
     1: i32 sec;
     2: i32 nsec;
-}
+} (
+     yarp.api.include = "yarp/dev/api.h"
+     yarp.api.keyword = "YARP_dev_API"
+ )
 
 service ClockRPC
 {
     ClockData getClock();
-}
+} (
+     yarp.api.include = "yarp/dev/api.h"
+     yarp.api.keyword = "YARP_dev_API"
+ )

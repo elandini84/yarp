@@ -11,12 +11,14 @@
 #ifndef YARP_THRIFT_GENERATOR_STRUCT_CLOCKDATA_H
 #define YARP_THRIFT_GENERATOR_STRUCT_CLOCKDATA_H
 
+#include <yarp/dev/api.h>
+
 #include <yarp/os/Wire.h>
 #include <yarp/os/idl/WireTypes.h>
 
 namespace yarp::dev {
 
-class ClockData :
+class YARP_dev_API ClockData :
         public yarp::os::idl::WirePortable
 {
 public:

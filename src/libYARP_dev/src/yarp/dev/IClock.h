@@ -6,7 +6,7 @@
 #ifndef YARP_DEV_ICLOCK_H
 #define YARP_DEV_ICLOCK_H
 
-#include <yarp/dev/ClockRPC.h>
+#include <yarp/dev/ClockData.h>
 #include <string>
 
 #include <yarp/os/Vocab.h>
