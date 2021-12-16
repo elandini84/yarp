@@ -15,8 +15,6 @@
 #include <yarp/os/idl/WireTypes.h>
 #include <yarp/dev/ClockData.h>
 
-namespace yarp::dev {
-
 class ClockRPC :
         public yarp::os::Wire
 {
@@ -24,7 +22,7 @@ public:
     // Constructor
     ClockRPC();
 
-    virtual ClockData getClock();
+    virtual yarp::dev::ClockData getClock();
 
     // help method
     virtual std::vector<std::string> help(const std::string& functionName = "--all");
@@ -32,7 +30,5 @@ public:
     // read from ConnectionReader
     bool read(yarp::os::ConnectionReader& connection) override;
 };
-
-} // namespace yarp::dev
 
 #endif // YARP_THRIFT_GENERATOR_SERVICE_CLOCKRPC_H

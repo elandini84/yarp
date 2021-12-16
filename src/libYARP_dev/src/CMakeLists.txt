@@ -181,6 +181,7 @@ set(YARP_dev_SRCS
   yarp/dev/IAudioVisualGrabber.cpp
   yarp/dev/IAudioVisualStream.cpp
   yarp/dev/IBattery.cpp
+  yarp/dev/IClock.cpp
   yarp/dev/IDepthVisualParams.cpp
   yarp/dev/IFrameGrabberControls.cpp
   yarp/dev/IFrameGrabberControlsDC1394.cpp
@@ -267,7 +268,7 @@ set(YARP_dev_IDL
   idl/MobileBaseVelocity.thrift
   idl/AudioPlayerStatus.thrift
   idl/AudioRecorderStatus.thrift
-  idl/Clock.thrift
+  idl/ClockData.thrift
 )
 
 if(TARGET YARP::YARP_math)

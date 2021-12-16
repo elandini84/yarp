@@ -20,10 +20,12 @@ if(NOT SKIP_fakeClock)
     PRIVATE
       YARP::YARP_os
       YARP::YARP_dev
+      YARP::YARP_sig
   )
   list(APPEND YARP_${YARP_PLUGIN_MASTER}_PRIVATE_DEPS
     YARP_os
     YARP_dev
+    YARP::YARP_sig
   )
 
   yarp_install(

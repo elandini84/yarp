@@ -8,11 +8,9 @@
 // This is an automatically generated file.
 // It could get re-generated if the ALLOW_IDL_GENERATION flag is on.
 
-#include <yarp/dev/ClockRPC.h>
+#include <ClockRPC.h>
 
 #include <yarp/os/idl/WireTypes.h>
-
-namespace yarp::dev {
 
 // getClock helper class declaration
 class ClockRPC_getClock_helper :
@@ -55,10 +53,10 @@ public:
         bool write(const yarp::os::idl::WireWriter& writer) const override;
         bool read(yarp::os::idl::WireReader& reader) override;
 
-        ClockData return_helper{};
+        yarp::dev::ClockData return_helper{};
     };
 
-    using funcptr_t = ClockData (*)();
+    using funcptr_t = yarp::dev::ClockData (*)();
     void call(ClockRPC* ptr);
 
     Command cmd;
@@ -67,8 +65,8 @@ public:
     static constexpr const char* s_tag{"getClock"};
     static constexpr size_t s_tag_len{1};
     static constexpr size_t s_cmd_len{1};
-    static constexpr size_t s_reply_len{2};
-    static constexpr const char* s_prototype{"ClockData ClockRPC::getClock()"};
+    static constexpr size_t s_reply_len{1};
+    static constexpr const char* s_prototype{"yarp::dev::ClockData ClockRPC::getClock()"};
     static constexpr const char* s_help{""};
 };
 
@@ -174,9 +172,6 @@ bool ClockRPC_getClock_helper::Reply::read(yarp::os::ConnectionReader& connectio
 bool ClockRPC_getClock_helper::Reply::write(const yarp::os::idl::WireWriter& writer) const
 {
     if (!writer.isNull()) {
-        if (!writer.writeListHeader(s_reply_len)) {
-            return false;
-        }
         if (!writer.write(return_helper)) {
             return false;
         }
@@ -186,9 +181,6 @@ bool ClockRPC_getClock_helper::Reply::write(const yarp::os::idl::WireWriter& wri
 
 bool ClockRPC_getClock_helper::Reply::read(yarp::os::idl::WireReader& reader)
 {
-    if (!reader.readListReturn()) {
-        return false;
-    }
     if (reader.noMore()) {
         reader.fail();
         return false;
@@ -211,14 +203,14 @@ ClockRPC::ClockRPC()
     yarp().setOwner(*this);
 }
 
-ClockData ClockRPC::getClock()
+yarp::dev::ClockData ClockRPC::getClock()
 {
     if (!yarp().canWrite()) {
         yError("Missing server method '%s'?", ClockRPC_getClock_helper::s_prototype);
     }
     ClockRPC_getClock_helper helper{};
     bool ok = yarp().write(helper, helper);
-    return ok ? helper.reply.return_helper : ClockData{};
+    return ok ? helper.reply.return_helper : yarp::dev::ClockData{};
 }
 
 // help method
@@ -319,5 +311,3 @@ bool ClockRPC::read(yarp::os::ConnectionReader& connection)
     }
     return false;
 }
-
-} // namespace yarp::dev
