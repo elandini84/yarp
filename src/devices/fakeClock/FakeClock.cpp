@@ -15,7 +15,7 @@ namespace {
 
 
 FakeClock::FakeClock():
-PeriodicThread(default_period)
+    PeriodicThread(default_period)
 {
     yCTrace(FAKECLOCK);
 }
@@ -32,9 +32,8 @@ bool FakeClock::threadInit()
 
 void FakeClock::run()
 {
-    std::lock_guard lock(m_clock_mutex);
+    std::lock_guard lockClock(m_clockMutex);
     double gotTime = yarp::os::Time::now();
-
     m_clockData = convertTime(gotTime);
 }
 
@@ -48,7 +47,7 @@ yarp::dev::ClockData FakeClock::convertTime(double input)
 {
     yarp::dev::ClockData converted;
     converted.sec = static_cast<int>(input);
-    converted.nsec = static_cast<int>((input-static_cast<double>(converted.sec))*1000000000);
+    converted.nsec = static_cast<int>((input-static_cast<double>(converted.sec))*1e+9);
 
     return converted;
 }
@@ -57,21 +56,25 @@ yarp::dev::ClockData FakeClock::convertTime(double input)
 bool FakeClock::open(yarp::os::Searchable& config)
 {
     // check period
-    if (!config.check("period", "refresh period of the internally stored clock value")) {
+    if (!config.check("period", "refresh period of the internally stored clock value"))
+    {
         yCInfo(FAKECLOCK) << "Using default 'period' parameter of " << default_period << "s";
-    }  else {
+    }
+    else
+    {
         m_period = config.find("period").asFloat64();
     }
-    PeriodicThread::setPeriod(m_period);
-    return PeriodicThread::start();
+
+    this->setPeriod(m_period);
+    return this->start();
 }
 
 
 bool FakeClock::close()
 {
-    if (PeriodicThread::isRunning())
+    if (this->isRunning())
     {
-        PeriodicThread::stop();
+        this->stop();
     }
     return true;
 }
@@ -79,6 +82,7 @@ bool FakeClock::close()
 
 yarp::dev::ClockData FakeClock::getClock()
 {
-    std::lock_guard lock(m_clock_mutex);
+    std::lock_guard lock(m_clockMutex);
     return m_clockData;
 }
+

@@ -13,7 +13,7 @@
 
 #include <yarp/os/Wire.h>
 #include <yarp/os/idl/WireTypes.h>
-#include <yarp/dev/ClockData.h>
+#include <return_getClock.h>
 
 class ClockRPC :
         public yarp::os::Wire
@@ -22,7 +22,7 @@ public:
     // Constructor
     ClockRPC();
 
-    virtual yarp::dev::ClockData getClock();
+    virtual return_getClock getClock();
 
     // help method
     virtual std::vector<std::string> help(const std::string& functionName = "--all");

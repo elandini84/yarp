@@ -15,6 +15,7 @@ yarp_begin_plugin_library(yarpmod
   add_subdirectory(audioFromFileDevice)
   add_subdirectory(audioToFileDevice)
   add_subdirectory(clockService)
+  add_subdirectory(clockNetworkWrappers)
   add_subdirectory(depthCamera)
   add_subdirectory(fakeClock)
   add_subdirectory(fakeDepthCamera)

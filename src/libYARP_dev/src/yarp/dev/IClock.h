@@ -30,10 +30,9 @@ public:
 
     /**
      * Returns the current clock value
-     * @return the clock in seconds
+     * @return the clock as a yarp::dev::ClockData object
      */
-    virtual ClockData getClock() = 0;
-
+    virtual yarp::dev::ClockData getClock() = 0;
 };
 
 #endif // YARP_DEV_ICLOCK_H

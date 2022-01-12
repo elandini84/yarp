@@ -12,6 +12,8 @@
 
 #include <yarp/os/idl/WireTypes.h>
 
+#include <algorithm>
+
 // getClock helper class declaration
 class ClockRPC_getClock_helper :
         public yarp::os::Portable
@@ -53,10 +55,10 @@ public:
         bool write(const yarp::os::idl::WireWriter& writer) const override;
         bool read(yarp::os::idl::WireReader& reader) override;
 
-        yarp::dev::ClockData return_helper{};
+        return_getClock return_helper{};
     };
 
-    using funcptr_t = yarp::dev::ClockData (*)();
+    using funcptr_t = return_getClock (*)();
     void call(ClockRPC* ptr);
 
     Command cmd;
@@ -65,8 +67,8 @@ public:
     static constexpr const char* s_tag{"getClock"};
     static constexpr size_t s_tag_len{1};
     static constexpr size_t s_cmd_len{1};
-    static constexpr size_t s_reply_len{1};
-    static constexpr const char* s_prototype{"yarp::dev::ClockData ClockRPC::getClock()"};
+    static constexpr size_t s_reply_len{2};
+    static constexpr const char* s_prototype{"return_getClock ClockRPC::getClock()"};
     static constexpr const char* s_help{""};
 };
 
@@ -137,7 +139,7 @@ bool ClockRPC_getClock_helper::Command::read(yarp::os::idl::WireReader& reader)
 
 bool ClockRPC_getClock_helper::Command::readTag(yarp::os::idl::WireReader& reader)
 {
-    std::string tag = reader.readTag();
+    std::string tag = reader.readTag(s_tag_len);
     if (reader.isError()) {
         return false;
     }
@@ -172,6 +174,9 @@ bool ClockRPC_getClock_helper::Reply::read(yarp::os::ConnectionReader& connectio
 bool ClockRPC_getClock_helper::Reply::write(const yarp::os::idl::WireWriter& writer) const
 {
     if (!writer.isNull()) {
+        if (!writer.writeListHeader(s_reply_len)) {
+            return false;
+        }
         if (!writer.write(return_helper)) {
             return false;
         }
@@ -181,6 +186,9 @@ bool ClockRPC_getClock_helper::Reply::write(const yarp::os::idl::WireWriter& wri
 
 bool ClockRPC_getClock_helper::Reply::read(yarp::os::idl::WireReader& reader)
 {
+    if (!reader.readListReturn()) {
+        return false;
+    }
     if (reader.noMore()) {
         reader.fail();
         return false;
@@ -203,14 +211,14 @@ ClockRPC::ClockRPC()
     yarp().setOwner(*this);
 }
 
-yarp::dev::ClockData ClockRPC::getClock()
+return_getClock ClockRPC::getClock()
 {
     if (!yarp().canWrite()) {
         yError("Missing server method '%s'?", ClockRPC_getClock_helper::s_prototype);
     }
     ClockRPC_getClock_helper helper{};
     bool ok = yarp().write(helper, helper);
-    return ok ? helper.reply.return_helper : yarp::dev::ClockData{};
+    return ok ? helper.reply.return_helper : return_getClock{};
 }
 
 // help method
@@ -242,6 +250,9 @@ std::vector<std::string> ClockRPC::help(const std::string& functionName)
 // read from ConnectionReader
 bool ClockRPC::read(yarp::os::ConnectionReader& connection)
 {
+    constexpr size_t max_tag_len = 1;
+    size_t tag_len = 1;
+
     yarp::os::idl::WireReader reader(connection);
     reader.expectAccept();
     if (!reader.readListHeader()) {
@@ -249,12 +260,12 @@ bool ClockRPC::read(yarp::os::ConnectionReader& connection)
         return false;
     }
 
-    std::string tag = reader.readTag();
+    std::string tag = reader.readTag(1);
     bool direct = (tag == "__direct__");
     if (direct) {
-        tag = reader.readTag();
+        tag = reader.readTag(1);
     }
-    while (!reader.isError()) {
+    while (tag_len <= max_tag_len && !reader.isError()) {
         if (tag == ClockRPC_getClock_helper::s_tag) {
             ClockRPC_getClock_helper helper;
             if (!helper.cmd.readArgs(reader)) {
@@ -303,11 +314,12 @@ bool ClockRPC::read(yarp::os::ConnectionReader& connection)
             reader.fail();
             return false;
         }
-        std::string next_tag = reader.readTag();
+        std::string next_tag = reader.readTag(1);
         if (next_tag.empty()) {
             break;
         }
         tag.append("_").append(next_tag);
+        tag_len = std::count(tag.begin(), tag.end(), '_') + 1;
     }
     return false;
 }

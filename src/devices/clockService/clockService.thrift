@@ -9,10 +9,13 @@ struct yarp_dev_ClockData {
   yarp.includefile="yarp/dev/ClockData.h"
 )
 
+struct return_getClock
+{
+    1: bool retValue;
+    2: yarp_dev_ClockData returnedClock;
+}
+
 service ClockRPC
 {
-    yarp_dev_ClockData getClock();
-} (
-    yarp.api.include = "yarp/dev/api.h"
-    yarp.api.keyword = "YARP_dev_API"
-)
+    return_getClock getClock();
+}

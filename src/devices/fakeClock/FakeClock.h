@@ -27,7 +27,7 @@ constexpr double default_period = 0.02;
  * Example of configuration file using .ini format.
  *
  * \code{.unparsed}
- * device FakeClock
+ * device fakeClock
  * period 0.02
  * \endcode
  *
@@ -75,9 +75,10 @@ public:
     yarp::dev::ClockData getClock() override;
 
 private:
+    double               m_period;
+    std::mutex           m_clockMutex;
+    std::mutex           m_promiseMutex;
     yarp::dev::ClockData m_clockData;
-    std::mutex m_clock_mutex;
-    double m_period;
 };
 
 #endif // YARP_FAKECLOCK_H
