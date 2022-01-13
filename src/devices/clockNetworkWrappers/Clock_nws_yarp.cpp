@@ -10,8 +10,7 @@
 
 YARP_LOG_COMPONENT(CLOCK_NWS_YARP, "yarp.devices.clock_nws_yarp")
 
-Clock_nws_yarp::Clock_nws_yarp() //:
-        //PeriodicThread(CLOCK_PERIOD_DEF)
+Clock_nws_yarp::Clock_nws_yarp()
 {}
 
 
@@ -23,17 +22,6 @@ bool Clock_nws_yarp::open(yarp::os::Searchable& config)
     }
 
     std::string prefix;
-
-    // Check "period"
-    if (!config.check("period", "Periodic thread period in seconds"))
-    {
-        yCWarning(CLOCK_NWS_YARP) << "No 'period' parameter found. Using the default value =" << CLOCK_PERIOD_DEF << "s";
-    }
-    else
-    {
-        m_period = config.find("period").asFloat64();
-        //this->setPeriod(m_period);
-    }
 
     // Check "nws_thrift_port_prefix"
     if (!config.check("nws_thrift_port_prefix", "a prefix for the nws thrift rpc port name"))
@@ -80,7 +68,6 @@ bool Clock_nws_yarp::open(yarp::os::Searchable& config)
         }
 
         yCInfo(CLOCK_NWS_YARP) << "Streaming clock on Yarp port enabled";
-        return this->start();
     }
 
     yCInfo(CLOCK_NWS_YARP) << "Streaming clock on Yarp port NOT enabled";
@@ -117,6 +104,14 @@ bool Clock_nws_yarp::attach( yarp::dev::PolyDriver* deviceToAttach)
         return false;
     }
 
+    //bool tmp = m_IClock->registerKey(std::to_string(this->getKey()));
+    //YARP_UNUSED(tmp);
+
+    if(m_streaming_port_enabled)
+    {
+        return this->start();
+    }
+
     return true;
 }
 
@@ -128,7 +123,8 @@ bool Clock_nws_yarp::threadInit()
         yCError(CLOCK_NWS_YARP, "Could not open \"%s\" port", m_outputStreamPortName.c_str());
         return false;
     }
-    yCInfo(CLOCK_NWS_YARP) << m_outputStreamPortName << "opened";
+    yCInfo(CLOCK_NWS_YARP) << "Stream port" << m_outputStreamPortName << "opened on id" << this->getKey();
+
     return true;
 }
 
@@ -142,10 +138,16 @@ void Clock_nws_yarp::threadRelease()
 
 void Clock_nws_yarp::run()
 {
+    bool tmp = m_IClock->registerKey(std::to_string(this->getKey()));
+    YARP_UNUSED(tmp);
     while(!this->isStopping())
     {
         if (m_IClock) {
-            yarp::dev::ClockData currClock = m_IClock->getClock();
+            yarp::dev::ClockData currClock;
+            if(!m_IClock->getSynchroClock(std::to_string(this->getKey()),currClock))
+            {
+                continue;
+            }
             m_outputStreamPort.write(currClock);
         }
     }
@@ -153,7 +155,6 @@ void Clock_nws_yarp::run()
 
 return_getClock Clock_nws_yarp::getClock()
 {
-    yCInfo(CLOCK_NWS_YARP) << "Get clock called";
     yarp::dev::ClockData clockData(-1,-1);
     return_getClock toReturn;
     if(m_IClock)
@@ -168,6 +169,5 @@ return_getClock Clock_nws_yarp::getClock()
     }
 
     toReturn.returnedClock = clockData;
-    yCInfo(CLOCK_NWS_YARP) << "Get clock returning";
     return toReturn;
 }

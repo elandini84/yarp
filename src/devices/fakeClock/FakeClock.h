@@ -6,6 +6,8 @@
 #ifndef YARP_FAKECLOCK_H
 #define YARP_FAKECLOCK_H
 
+#include <algorithm>
+
 #include <yarp/os/PeriodicThread.h>
 #include <yarp/dev/DeviceDriver.h>
 #include <yarp/dev/IClock.h>
@@ -73,12 +75,18 @@ public:
 
     // IClock
     yarp::dev::ClockData getClock() override;
+    bool registerKey(std::string inputKey) override;
+    bool getSynchroClock(std::string inputKey, yarp::dev::ClockData& clockToFill) override;
 
 private:
-    double               m_period;
-    std::mutex           m_clockMutex;
-    std::mutex           m_promiseMutex;
-    yarp::dev::ClockData m_clockData;
+    double                    m_period;
+    std::mutex                m_clockMutex;
+    std::mutex                m_synchroMutex;
+    std::mutex                m_testMutex;
+    std::mutex                m_keyMutex;
+    yarp::dev::ClockData      m_clockData;
+    std::vector<std::string>  m_readersKeys;
+    std::vector<std::string>  m_readersToGo;
 };
 
 #endif // YARP_FAKECLOCK_H

@@ -12,7 +12,6 @@
 #include <yarp/os/PeriodicThread.h>
 #include <ClockRPC.h>
 
-#define CLOCK_PERIOD_DEF 0.02
 
 /**
  * @ingroup dev_impl_nws_yarp
@@ -27,7 +26,6 @@
  *   Parameters required by this device are:
  * | Parameter name               | SubParameter  | Type    | Units  | Default Value | Required  | Description                                                | Notes                      |
  * |:----------------------------:|:-------------:|:-------:|:------:|:-------------:|:---------:|:----------------------------------------------------------:|:--------------------------:|
- * | period                       |      -        | double  | s      | 0.02          | No        | Periodic thread period in seconds                          | default 0.02s              |
  * | nws_thrift_port_prefix       |      -        | string  | -      | ""            | No        | a prefix for the nws thrift rpc port name                  |                            |
  * | output_streaming_port_prefix |      -        | string  | -      | ""            | No        | a prefix for the output streaming port name                |                            |
  * | streaming_enabled            |      -        | int     | -      | 1             | No        | enable/disable the clock publishing on the streaming port  | 0 = disabled; 1 = enabled  |
@@ -69,7 +67,6 @@
 
 class Clock_nws_yarp : public yarp::dev::DeviceDriver,
                        public yarp::dev::WrapperSingle,
-                       //public yarp::os::PeriodicThread,
                        yarp::os::Thread,
                        public ClockRPC
 {
@@ -93,14 +90,13 @@ public:
     bool  attach(yarp::dev::PolyDriver* deviceToAttach) override;
     bool  detach() override;
 
-    // yarp::os::PeriodicThread
+    // yarp::os::Thread
     bool threadInit() override;
     void threadRelease() override;
     void run() override;
 
 private:
     bool                m_streaming_port_enabled{true};
-    double              m_period{CLOCK_PERIOD_DEF};
     std::string         m_serverThriftPortName{"/clock_nws_yarp/thrift"};
     std::string         m_outputStreamPortName{"/clock"};
     yarp::os::Port      m_serverThriftPort;

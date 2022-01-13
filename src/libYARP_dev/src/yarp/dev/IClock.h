@@ -33,6 +33,21 @@ public:
      * @return the clock as a yarp::dev::ClockData object
      */
     virtual yarp::dev::ClockData getClock() = 0;
+
+    /**
+     * Returns the current clock value
+     * @param inputKey (std::string) The reader key
+     * @param clockToFill (yarp::dev::ClockData) the clock as a yarp::dev::ClockData object
+     * @return true if everything went fine
+     */
+    virtual bool getSynchroClock(std::string inputKey, yarp::dev::ClockData& clockToFill) = 0;
+
+    /**
+     * Sets a reader key
+     * @param inputKey (std::string) The key to set
+     * @return a boolean, true if the key has not already been used, false otherwise
+     */
+    virtual bool registerKey(std::string inputKey) = 0;
 };
 
 #endif // YARP_DEV_ICLOCK_H

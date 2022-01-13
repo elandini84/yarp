@@ -33,8 +33,15 @@ bool FakeClock::threadInit()
 void FakeClock::run()
 {
     std::lock_guard lockClock(m_clockMutex);
+    std::lock_guard lockSynch(m_synchroMutex);
     double gotTime = yarp::os::Time::now();
     m_clockData = convertTime(gotTime);
+    std::lock_guard lockKey(m_keyMutex);
+    if(!m_readersKeys.empty() && m_readersToGo.empty())
+    {
+        m_testMutex.unlock();
+    }
+    m_readersToGo = m_readersKeys;
 }
 
 
@@ -86,3 +93,42 @@ yarp::dev::ClockData FakeClock::getClock()
     return m_clockData;
 }
 
+
+bool FakeClock::registerKey(std::string inputKey)
+{
+    std::lock_guard lockKey(m_keyMutex);
+    if (std::find(m_readersKeys.begin(), m_readersKeys.end(), inputKey) != m_readersKeys.end())
+    {
+        yCError(FAKECLOCK) << "The key passed (" << inputKey << ") has already been registered";
+        return false;
+    }
+
+    m_readersKeys.push_back(inputKey);
+    yCInfo(FAKECLOCK) << "KEY REGISTERED (" << inputKey << ")";
+    return true;
+}
+
+
+bool FakeClock::getSynchroClock(std::string inputKey, yarp::dev::ClockData& clockToFill)
+{
+    m_testMutex.lock();
+    std::lock_guard lock(m_synchroMutex);
+    if (std::find(m_readersToGo.begin(), m_readersToGo.end(), inputKey) == m_readersToGo.end())
+    {
+        if (!m_readersToGo.empty())
+        {
+            m_testMutex.unlock();
+        }
+        return false;
+    }
+    m_readersToGo.erase(std::remove(m_readersToGo.begin(), m_readersToGo.end(), inputKey), m_readersToGo.end());
+    clockToFill.sec = m_clockData.sec;
+    clockToFill.nsec = m_clockData.nsec;
+
+    if (!m_readersToGo.empty())
+    {
+        m_testMutex.unlock();
+    }
+
+    return true;
+}
