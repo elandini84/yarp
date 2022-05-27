@@ -322,6 +322,13 @@ public:
     bool removeIapplication(ApplicationInterface& iapp);
     void removeAllIapplications() { Iapplications.clear(); }
 
+    size_t appParametersCount() {return appParameters.size();}
+    bool getAppParameterAt(const std::string& paramName, std::string& paramValue);
+    bool setAppParameterAt(const std::string& paramName, std::string paramValue);
+    bool addAppParameter(std::string& paramName, std::string paramValue);
+    bool removeAppParameterAt(const std::string& paramName);
+    void removeAllAppParameters() {appParameters.clear();}
+
     int resourcesCount() { return resources.size(); }
     ResYarpPort& getResourceAt(int index){ return resources[index]; }
     bool addResource(ResYarpPort &res);
@@ -391,6 +398,7 @@ private:
     std::string strBasePrefix;
     std::string strXmlFile;
     Node* appOwner;
+    std::map<std::string,std::string> appParameters;
 
     GraphicModel modelBase;
 

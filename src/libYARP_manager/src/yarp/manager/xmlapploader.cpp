@@ -286,6 +286,41 @@ Application* XmlAppLoader::parsXml(const char* szFile)
         }
     }
 
+    std::map<std::string,std::string> appParams;
+
+    for(TiXmlElement* mod = root->FirstChildElement(); mod; mod = mod->NextSiblingElement())
+    {
+        if(compareString(mod->Value(), "app-param"))
+        {
+            TiXmlElement* elemName;
+            TiXmlElement* elemValue;
+            std::string  paramName;
+            std::string  paramValue;
+            if((elemName = (TiXmlElement*) mod->FirstChild("name")) && (elemValue = (TiXmlElement*) mod->FirstChild("value"))){
+                paramName = elemName->GetText();
+                paramValue = elemValue->GetText();
+
+                if (appParams.count(paramName)==0)
+                {
+                    appParams[paramName] = paramValue;
+                    app.addAppParameter(paramName,paramValue);
+                }
+                else{
+                    OSTRINGSTREAM war;
+                    war<<"App-param "<<paramName << " already present with value: " << appParams[paramName];
+                    logger->addWarning(war);
+                }
+            }
+            else
+            {
+                OSTRINGSTREAM war;
+                war<<"App-param from "<<szFile<<" at line "\
+                    <<mod->Row()<<" has not the needed tags.";
+                logger->addWarning(war);
+            }
+        }
+    }
+
     /* retrieving resources information*/
     TiXmlElement* resources;
     if ((resources = (TiXmlElement*)root->FirstChild("dependencies"))) {
@@ -296,8 +331,8 @@ Application* XmlAppLoader::parsXml(const char* szFile)
             {
                 if(res->GetText())
                 {
-                    ResYarpPort resource(parser->parseText(res->GetText()).c_str());
-                    resource.setPort(parser->parseText(res->GetText()).c_str());
+                    ResYarpPort resource(parser->parseText(res->GetText(),appParams).c_str());
+                    resource.setPort(parser->parseText(res->GetText(),appParams).c_str());
                     app.addResource(resource);
                 }
             }
@@ -325,43 +360,6 @@ Application* XmlAppLoader::parsXml(const char* szFile)
     pairNode.first = "prefix";      pairNode.second = &ModuleInterface::setPrefix;      modList.push_back(pairNode);
     pairNode.first = "environment"; pairNode.second = &ModuleInterface::setEnvironment; modList.push_back(pairNode);
     pairNode.first = "display";     pairNode.second = &ModuleInterface::setDisplay;     modList.push_back(pairNode);
-
-    std::map<std::string,std::string> appParams;
-
-    for(TiXmlElement* mod = root->FirstChildElement(); mod; mod = mod->NextSiblingElement())
-    {
-        if(compareString(mod->Value(), "app-param"))
-        {
-            TiXmlElement* elemName;
-            TiXmlElement* elemValue;
-            std::string  paramName;
-            std::string  paramValue;
-            if((elemName = (TiXmlElement*) mod->FirstChild("name")) && (elemValue = (TiXmlElement*) mod->FirstChild("value"))){
-                paramName = elemName->GetText();
-                paramValue = elemValue->GetText();
-
-                if (appParams.count(paramName)==0)
-                {
-                    appParams[paramName] = paramValue;
-                    OSTRINGSTREAM war;
-                    war<<"App-param "<<paramName << " has value: " << paramValue;
-                    logger->addWarning(war);
-                }
-                else{
-                    OSTRINGSTREAM war;
-                    war<<"App-param "<<paramName << " already present with value: " << appParams[paramName];
-                    logger->addWarning(war);
-                }
-            }
-            else
-            {
-                OSTRINGSTREAM war;
-                war<<"App-param from "<<szFile<<" at line "\
-                    <<mod->Row()<<" has not the needed tags.";
-                logger->addWarning(war);
-            }
-        }
-    }
 
     for(TiXmlElement* mod = root->FirstChildElement(); mod; mod = mod->NextSiblingElement())
     {

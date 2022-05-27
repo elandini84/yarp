@@ -209,6 +209,49 @@ bool Application::removeIapplication(ApplicationInterface& iapp)
     return true;
 }
 
+bool Application::getAppParameterAt(const std::string& paramName, std::string& paramValue)
+{
+    if (appParameters.count(paramName)==0){
+        return false;
+    }
+
+    paramValue = appParameters[paramName];
+
+    return true;
+}
+
+bool Application::setAppParameterAt(const std::string& paramName, std::string paramValue)
+{
+    if (appParameters.count(paramName)==0){
+        return false;
+    }
+
+    appParameters[paramName] = paramValue;
+    return true;
+}
+
+bool Application::addAppParameter(std::string& paramName, std::string paramValue)
+{
+    if (appParameters.count(paramName)>0){
+        return false;
+    }
+
+    appParameters[paramName] = paramValue;
+    return true;
+}
+
+bool Application::removeAppParameterAt(const std::string& paramName)
+{
+    if (appParameters.count(paramName)==0){
+        return false;
+    }
+
+    auto toRemove = appParameters.find(paramName);
+    appParameters.erase(toRemove);
+
+    return true;
+}
+
 bool Application::addResource(ResYarpPort &res)
 {
     resources.push_back(res);
