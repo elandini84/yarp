@@ -541,6 +541,30 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                     IApp.setPrefix(parser->parseText(prefix->GetText(),appParams).c_str());
                 }
 
+                for(TiXmlElement* apparam = embApp->FirstChildElement(); apparam; apparam = apparam->NextSiblingElement())
+                {
+                    if(compareString(apparam->Value(), "app-param"))
+                    {
+                        TiXmlElement* elemName;
+                        TiXmlElement* elemValue;
+                        std::string  paramName;
+                        std::string  paramValue;
+                        if((elemName = (TiXmlElement*) apparam->FirstChild("name")) && (elemValue = (TiXmlElement*) apparam->FirstChild("value"))){
+                            paramName = elemName->GetText();
+                            paramValue = parser->parseText(elemValue->GetText(),appParams);
+
+                            IApp.setAppParameter(paramName,paramValue);
+                        }
+                        else
+                        {
+                            OSTRINGSTREAM war;
+                            war<<"App-param from "<<szFile<<" at line "\
+                                <<apparam->Row()<<" has not the needed tags.";
+                            logger->addWarning(war);
+                        }
+                    }
+                }
+
 #ifdef WITH_GEOMETRY
                 auto* element = (TiXmlElement*) embApp->FirstChild("geometry");
                 if(element && element->GetText())

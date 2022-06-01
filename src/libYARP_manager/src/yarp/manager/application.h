@@ -257,6 +257,7 @@ public:
     }
     virtual ~ApplicationInterface() = default;
     void setPrefix(const char* szPrefix) { if(szPrefix) { strPrefix = szPrefix; } }
+    void setAppParameter(const std::string& paramName, const std::string& paramValue) { m_appParams[paramName] = paramValue; }
     const char* getName() { return strName.c_str(); }
     const char* getPrefix() { return strPrefix.c_str(); }
     bool operator==(const ApplicationInterface& alt) const {
@@ -276,6 +277,7 @@ private:
     std::string strName;
     std::string strPrefix;
     GraphicModel modelBase;
+    std::map<std::string,std::string> m_appParams;
 };
 
 
