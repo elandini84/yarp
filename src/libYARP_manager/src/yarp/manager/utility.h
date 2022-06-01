@@ -13,6 +13,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <map>
 
 #include <yarp/manager/ymm-types.h>
 
@@ -39,6 +40,32 @@ public:
 
 private:
     std::string dummyStr;
+};
+
+class ParamStrStream
+{
+public:
+    ParamStrStream();
+    ParamStrStream(const std::string& str);
+    ~ParamStrStream();
+    std::string str();
+    ParamStrStream& operator<<(ParamStrStream &oss);
+    ParamStrStream& operator<<(const std::string &str);
+    ParamStrStream& operator<<(int n);
+    ParamStrStream& operator<<(double n);
+    ParamStrStream& operator = (const char* sz);
+    ParamStrStream& operator = (char* sz);
+    ParamStrStream& operator = (const std::string &str);
+    ParamStrStream& operator = (ParamStrStream &oss);
+    ParamStrStream& operator = (int n);
+    void updateParameters(std::map<std::string,std::string> parameters);
+    std::string composeString();
+    friend std::ostream& operator << (std::ostream &os , ParamStrStream& sstr);
+private:
+    std::string m_dummyStr;
+    std::map<std::string,std::string> m_parameters;
+    void extractParameters(const std::string& input);
+    bool isParameterValid(const std::string& paramName);
 };
 
 

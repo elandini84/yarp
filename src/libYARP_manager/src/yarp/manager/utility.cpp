@@ -92,6 +92,162 @@ std::ostream& operator << (std::ostream &os , StrStream& sstr)
 
 
 /**
+ * ParamStrStream
+ */
+
+ParamStrStream::ParamStrStream() = default;
+
+ParamStrStream::ParamStrStream(const std::string& str) {
+    m_parameters.clear();
+    extractParameters(str);
+    m_dummyStr = str;
+}
+
+ParamStrStream::~ParamStrStream() = default;
+
+std::string ParamStrStream::str() {
+    return composeString();
+}
+
+ParamStrStream& ParamStrStream::operator<<(ParamStrStream &oss) {
+    m_dummyStr += oss.str();
+    extractParameters(oss.str());
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator<<(const std::string &str) {
+    m_dummyStr += str;
+    extractParameters(str);
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator<<(int n) {
+    char buff[64];
+    sprintf(buff, "%d", n);
+    std::string addendum = std::string(buff);
+    m_dummyStr += addendum;
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator<<(double n) {
+    char buff[64];
+    sprintf(buff, "%.2f", n);
+    std::string addendum = std::string(buff);
+    m_dummyStr += addendum;
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator = (const char* sz) {
+    m_parameters.clear();
+    std::string addendum = std::string(sz);
+    m_dummyStr += addendum;
+    extractParameters(addendum);
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator = (char* sz) {
+    m_parameters.clear();
+    std::string addendum = std::string(sz);
+    m_dummyStr += addendum;
+    extractParameters(addendum);
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator = (const std::string &str) {
+    m_parameters.clear();
+    m_dummyStr = str;
+    extractParameters(str);
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator = (ParamStrStream &oss) {
+    m_parameters.clear();
+    m_dummyStr = oss.str();
+    extractParameters(oss.str());
+    return *this;
+}
+
+ParamStrStream& ParamStrStream::operator = (int n) {
+    m_parameters.clear();
+    char buff[64];
+    sprintf(buff, "%d", n);
+    m_dummyStr = std::string(buff);
+    return *this;
+}
+
+std::ostream& operator << (std::ostream &os , ParamStrStream& sstr)
+{
+    std::cout<<sstr.str();
+    return os;
+}
+
+bool ParamStrStream::isParameterValid(const std::string& paramName)
+{
+    return m_parameters.count(paramName) != 0;
+}
+
+void ParamStrStream::updateParameters(std::map<std::string, std::string> parameters)
+{
+    for(const auto& parPair : parameters)
+    {
+        if (isParameterValid(parPair.first))
+        {
+            parameters[parPair.first] = parPair.second;
+        }
+    }
+}
+
+void ParamStrStream::extractParameters(const std::string& input)
+{
+    std::vector<std::string> parametersFound;
+    size_t start = 0;
+    size_t end = 0;
+    std::string startKeyword;
+    std::string  endKeyword;
+    startKeyword = "#{";
+    endKeyword   = "}";
+    start = input.find(startKeyword);
+    end = input.find(endKeyword, start);
+    while(start != std::string::npos && end != std::string::npos)
+    {
+        std::string envName;
+
+        envName   = input.substr(start + startKeyword.size(), end - start -startKeyword.size());
+        if(m_parameters.count(envName) == 0)
+        {
+            m_parameters[envName] = "";
+        }
+        start = input.find(startKeyword);
+        end = input.find(endKeyword, start);
+    }
+}
+
+std::string ParamStrStream::composeString()
+{
+    std::vector<std::string> parametersFound;
+    size_t start = 0;
+    size_t end = 0;
+    std::string startKeyword;
+    std::string  endKeyword;
+    std::string  outputString;
+    startKeyword = "#{";
+    endKeyword   = "}";
+    start = m_dummyStr.find(startKeyword);
+    end = m_dummyStr.find(endKeyword, start);
+    while(start != std::string::npos && end != std::string::npos)
+    {
+        std::string envName;
+        envName   = m_dummyStr.substr(start + startKeyword.size(), end - start -startKeyword.size());
+        outputString = m_dummyStr.substr(0, start) + m_parameters[envName] + m_dummyStr.substr(end + endKeyword.size(), m_dummyStr.size() - endKeyword.size());
+        start = m_dummyStr.find(startKeyword);
+        end = m_dummyStr.find(endKeyword, start);
+    }
+
+    return outputString;
+}
+
+
+/**
  * Singleton class ErrorLogger
  */
 
