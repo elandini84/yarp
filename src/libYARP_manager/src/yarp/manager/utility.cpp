@@ -109,6 +109,10 @@ std::string ParamStrStream::str() {
     return composeString();
 }
 
+std::string ParamStrStream::str() {
+    return m_dummyStr;
+}
+
 ParamStrStream& ParamStrStream::operator<<(ParamStrStream &oss) {
     m_dummyStr += oss.str();
     extractParameters(oss.str());
@@ -199,7 +203,6 @@ void ParamStrStream::updateParameters(std::map<std::string, std::string> paramet
 
 void ParamStrStream::extractParameters(const std::string& input)
 {
-    std::vector<std::string> parametersFound;
     size_t start = 0;
     size_t end = 0;
     std::string startKeyword;
@@ -224,7 +227,6 @@ void ParamStrStream::extractParameters(const std::string& input)
 
 std::string ParamStrStream::composeString()
 {
-    std::vector<std::string> parametersFound;
     size_t start = 0;
     size_t end = 0;
     std::string startKeyword;

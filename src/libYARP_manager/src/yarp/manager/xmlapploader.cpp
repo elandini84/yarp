@@ -331,8 +331,9 @@ Application* XmlAppLoader::parsXml(const char* szFile)
             {
                 if(res->GetText())
                 {
-                    ResYarpPort resource(parser->parseText(res->GetText(),appParams).c_str());
-                    resource.setPort(parser->parseText(res->GetText(),appParams).c_str());
+                    ResYarpPort resource(parser->smartParseText(res->GetText()).dummyStr().c_str());
+                    resource.setPort(parser->smartParseText(res->GetText()).dummyStr().c_str());
+                    resource.updatePortParams(appParams);
                     app.addResource(resource);
                 }
             }

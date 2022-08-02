@@ -49,6 +49,7 @@ public:
     ParamStrStream(const std::string& str);
     ~ParamStrStream();
     std::string str();
+    std::string dummyStr();
     ParamStrStream& operator<<(ParamStrStream &oss);
     ParamStrStream& operator<<(const std::string &str);
     ParamStrStream& operator<<(int n);

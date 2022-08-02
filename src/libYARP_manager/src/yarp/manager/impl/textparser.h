@@ -96,6 +96,60 @@ public:
 
     }
 
+    ParamStrStream    smartParseText(const char *element)
+    {
+        ParamStrStream ret;
+        std::string startKeyword, endKeyword;
+        size_t s, e;
+
+        if(element)
+        {
+            ret          = element;
+            startKeyword = "$ENV{";
+            endKeyword   = "}";
+            bool badSymbol    = ret.dummyStr().find("$") != std::string::npos;
+            s            = ret.dummyStr().find(startKeyword);
+            e            = ret.dummyStr().find(endKeyword, s);
+
+            if(s != std::string::npos && e != std::string::npos)
+            {
+                std::string envName, envValue;
+
+                envName   = ret.dummyStr().substr(s + startKeyword.size(), e - s -startKeyword.size());
+                envValue  = yarp::conf::environment::get_string(envName);
+                ret       = ret.dummyStr().substr(0, s)+ envValue + ret.dummyStr().substr(e + endKeyword.size(), ret.dummyStr().size() - endKeyword.size());
+                return  smartParseText(ret.dummyStr().c_str());
+            }
+
+            ret = element;
+            startKeyword = "${";
+            endKeyword   = "}";
+            s            = ret.dummyStr().find(startKeyword);
+            e            = ret.dummyStr().find(endKeyword, s);
+
+            if(s != std::string::npos && e != std::string::npos)
+            {
+                std::string envName, envValue;
+
+                envName   = ret.dummyStr().substr(s + startKeyword.size(), e - s -startKeyword.size());
+                envValue  = variables[envName];
+                ret       = ret.dummyStr().substr(0, s)+ envValue + ret.dummyStr().substr(e + endKeyword.size(), ret.dummyStr().size() - endKeyword.size());
+                return smartParseText(ret.dummyStr().c_str());
+            }
+
+            if(badSymbol)
+            {
+                war << "use of symbol '$' detected but no keyword understood.. possible use: ${foo} for internal variable or $ENV{foo} for environment variable";
+                if (logger) {
+                    logger->addWarning(war);
+                }
+            }
+        }
+
+        return ret;
+
+    }
+
     std::string    parseText(const char *element, std::map<std::string,std::string> parameters)
     {
 

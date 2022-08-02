@@ -46,7 +46,8 @@ public:
     ResYarpPort(const char* szName);
     ~ResYarpPort() override;
     void setPort(const char* szPort) { if(szPort) { strPort = szPort; } }
-    const char* getPort() { return strPort.c_str(); }
+    void updatePortParams(std::map<std::string,std::string> parameters) { strPort.updateParameters(parameters); }
+    const char* getPort() { return strPort.str().c_str(); }
     void setRequest(const char* szReq) { if(szReq) { strRequest = szReq; } }
     void setReply(const char* szRep) { if(szRep) { strReply = szRep; } }
     const char* getRequest() { return strRequest.c_str(); }
@@ -59,7 +60,7 @@ public:
 protected:
 
 private:
-    std::string strPort;
+    ParamStrStream strPort;
     std::string strRequest;
     std::string strReply;
     double timeout;

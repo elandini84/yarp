@@ -86,8 +86,8 @@ bool ResYarpPort::satisfy(GenericResource* resource)
     if (!resport) {
         return false;
     }
-    return (strPort == std::string(resport->getPort()) ||
-            strPort == std::string(resport->getName()) );
+    return (strPort.str() == std::string(resport->getPort()) ||
+            strPort.str() == std::string(resport->getName()) );
 }
 
 ResYarpPort::~ResYarpPort() = default;
