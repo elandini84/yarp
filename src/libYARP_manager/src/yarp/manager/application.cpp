@@ -41,6 +41,19 @@ ModuleInterface::ModuleInterface(Module* module) :
    //TODO: resources should be added too
 }
 
+void ModuleInterface::updateStringsParameters(const std::map<std::string,std::string>& parameters){
+   strName.updateParameters(parameters);
+   strHost.updateParameters(parameters);
+   strParam.updateParameters(parameters);
+   strWorkDir.updateParameters(parameters);
+   strStdio.updateParameters(parameters);
+   strBroker.updateParameters(parameters);
+   strPrefix.updateParameters(parameters);
+   strEnvironment.updateParameters(parameters);
+   strDisplay.updateParameters(parameters);
+   strTag.updateParameters(parameters);
+}
+
 bool ModuleInterface::addPortmap(Portmap &portmap)
 {
     portmaps.push_back(portmap);

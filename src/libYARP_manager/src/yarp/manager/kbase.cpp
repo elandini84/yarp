@@ -414,6 +414,7 @@ bool KnowledgeBase::makeupApplication(Application* application)
     for(int i=0; i<application->imoduleCount(); i++)
     {
         ModuleInterface &mod = application->getImoduleAt(i);
+        mod.updateStringsParameters(application->getAppParameters());
         addIModuleToApplication(application, mod);
     } // end of for loop
 

@@ -376,7 +376,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 text = nullptr;
                 if(element->GetText())
                 {
-                    elemText = parser->parseText(element->GetText(),appParams);
+                    elemText = parser->parseText(element->GetText());
                     text     = elemText.c_str();
                 }
 
@@ -389,7 +389,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                         text = nullptr;
                         if(element->GetText())
                         {
-                            elemText = parser->parseText(element->GetText(),appParams);
+                            elemText = parser->parseText(element->GetText());
                             text     = elemText.c_str();
                         }
 
@@ -401,7 +401,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 {
                     if(element->GetText())
                     {
-                        elemText = parser->parseText(element->GetText(),appParams);
+                        elemText = parser->parseText(element->GetText());
                         text     = elemText.c_str();
                     }
 
@@ -412,7 +412,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 element = (TiXmlElement*) mod->FirstChild("geometry");
                 if(element && element->GetText())
                 {
-                    yarp::os::Property prop(parser->parseText(element->GetText(),appParams).c_str());
+                    yarp::os::Property prop(parser->parseText(element->GetText()).c_str());
                     GraphicModel model;
                     GyPoint pt;
                     if(prop.check("Pos"))
@@ -469,13 +469,13 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                         if(compareString(res->Value(), "wait"))
                         {
                             if (res->Attribute("when") && compareString(res->Attribute("when"), "start")) {
-                                if (parser->parseText(res->GetText(),appParams).c_str()) {
-                                    module.setPostExecWait(atof(parser->parseText(res->GetText(),appParams).c_str()));
+                                if (parser->parseText(res->GetText()).c_str()) {
+                                    module.setPostExecWait(atof(parser->parseText(res->GetText()).c_str()));
                                 }
                             }
                             else if (res->Attribute("when") && compareString(res->Attribute("when"), "stop")) {
                                 if (parser->parseText(res->GetText()).c_str()) {
-                                    module.setPostStopWait(atof(parser->parseText(res->GetText(),appParams).c_str()));
+                                    module.setPostStopWait(atof(parser->parseText(res->GetText()).c_str()));
                                 }
                             }
                             else if (res->Attribute("when") && strlen(res->Attribute("when"))) {
@@ -484,8 +484,8 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                                 logger->addWarning(war);
                             }
                             else {  // if "when" has not been specified, use setPostExecWait!
-                                if (parser->parseText(res->GetText(),appParams).c_str()) {
-                                    module.setPostExecWait(atof(parser->parseText(res->GetText(),appParams).c_str()));
+                                if (parser->parseText(res->GetText()).c_str()) {
+                                    module.setPostExecWait(atof(parser->parseText(res->GetText()).c_str()));
                                 }
                             }
                         }

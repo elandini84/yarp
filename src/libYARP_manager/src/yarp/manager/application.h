@@ -184,21 +184,22 @@ public:
     void setEnvironment(const char* szEnv) {if(szEnv) { strEnvironment = szEnv; } }
     void setTag(const char* szTag) {if(szTag) { strTag = szTag; } }
     void setDisplay(const char* szDisplay) {if(szDisplay) { strDisplay = szDisplay; } }
+    void updateStringsParameters(const std::map<std::string,std::string>& parameters);
 
-    const char* getName() { return strName.c_str(); }
-    const char* getHost() { return strHost.c_str(); }
-    const char* getParam() { return strParam.c_str(); }
+    const char* getName() { return strName.str().c_str(); }
+    const char* getHost() { return strHost.str().c_str(); }
+    const char* getParam() { return strParam.str().c_str(); }
     int getRank() { return iRank; }
-    const char* getWorkDir() { return strWorkDir.c_str(); }
-    const char* getStdio() { return strStdio.c_str(); }
-    const char* getBroker() { return strBroker.c_str(); }
-    const char* getPrefix() { return strPrefix.c_str(); }
-    const char* getEnvironment() { return strEnvironment.c_str(); }
-    const char* getTag() { return strTag.c_str(); }
-    const char* getDisplay() { return strDisplay.c_str(); }
+    const char* getWorkDir() { return strWorkDir.str().c_str(); }
+    const char* getStdio() { return strStdio.str().c_str(); }
+    const char* getBroker() { return strBroker.str().c_str(); }
+    const char* getPrefix() { return strPrefix.str().c_str(); }
+    const char* getEnvironment() { return strEnvironment.str().c_str(); }
+    const char* getTag() { return strTag.str().c_str(); }
+    const char* getDisplay() { return strDisplay.str().c_str(); }
 
     bool operator==(const ModuleInterface& modint) const {
-        return (strName == modint.strName);
+        return (strName.str() == modint.strName.str());
     }
 
     void addResource(ResYarpPort &res) { resources.push_back(res); }
@@ -226,22 +227,22 @@ public:
 protected:
 
 private:
-    std::string strName;
-    std::string strHost;
-    std::string strParam;
-    std::string strWorkDir;
-    std::string strStdio;
-    std::string strBroker;
-    std::string strPrefix;
-    std::string strEnvironment;
-    std::string strDisplay;
+    ParamStrStream strName;
+    ParamStrStream strHost;
+    ParamStrStream strParam;
+    ParamStrStream strWorkDir;
+    ParamStrStream strStdio;
+    ParamStrStream strBroker;
+    ParamStrStream strPrefix;
+    ParamStrStream strEnvironment;
+    ParamStrStream strDisplay;
     int iRank;
     ResourceContainer resources;
     double waitStart;
     double waitStop;
     PortmapContainer portmaps;
     PortmapIterator findPortmap(Portmap& portmap);
-    std::string strTag;
+    ParamStrStream strTag;
     GraphicModel modelBase;
 };
 
