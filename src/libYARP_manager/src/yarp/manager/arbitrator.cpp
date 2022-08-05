@@ -57,7 +57,6 @@ void Arbitrator::removeRule(const char* con)
     */
 }
 
-
 bool Arbitrator::trainWeights(const char* opnd)
 {
     __CHECK_NULLPTR(opnd);
@@ -74,7 +73,7 @@ bool Arbitrator::trainWeights(const char* opnd)
     }
 
     BinaryExpParser parser;
-    std::map<std::string, std::string>::iterator itr;
+    std::map<std::string, ParamStrStream>::iterator itr;
     for (itr = rules.begin(); itr != rules.end(); itr++) {
         parser.addRestrictedOperand((itr->first).c_str());
     }
@@ -118,7 +117,7 @@ bool Arbitrator::trainWeights()
     biases.clear();
     alphas.clear();
     bool bAllOk = true;
-    std::map<std::string, std::string>::iterator itr;
+    std::map<std::string, ParamStrStream>::iterator itr;
     for (itr = rules.begin(); itr != rules.end(); itr++) {
         bAllOk &= trainWeights((itr->first).c_str());
     }

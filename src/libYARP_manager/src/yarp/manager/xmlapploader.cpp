@@ -604,7 +604,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
             auto* port = (TiXmlElement*) arb->FirstChild("port");
             if(port && port->GetText())
             {
-                Arbitrator arbitrator(parser->parseText(port->GetText(),appParams).c_str());
+                Arbitrator arbitrator(parser->parseText(port->GetText()).c_str());
 
                 // retrieving rules
                 for(TiXmlElement* rule = arb->FirstChildElement(); rule;
@@ -613,7 +613,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                     if(compareString(rule->Value(), "rule"))
                     {
                         if (rule->Attribute("connection")) {
-                            arbitrator.addRule(rule->Attribute("connection"), parser->parseText(rule->GetText(),appParams).c_str());
+                            arbitrator.addRule(rule->Attribute("connection"), parser->parseText(rule->GetText()).c_str());
                         }
                     }
                 }
@@ -621,7 +621,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 auto* geometry = (TiXmlElement*) arb->FirstChild("geometry");
                 if(geometry && geometry->GetText())
                 {
-                    yarp::os::Property prop(parser->parseText(geometry->GetText(),appParams).c_str());
+                    yarp::os::Property prop(parser->parseText(geometry->GetText()).c_str());
                     GraphicModel model;
                     if(prop.check("Pos"))
                     {

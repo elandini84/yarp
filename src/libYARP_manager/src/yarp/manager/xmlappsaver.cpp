@@ -259,12 +259,12 @@ bool XmlAppSaver::serialXml(Application* app, const char* szFile)
             port->LinkEndChild(new TiXmlText(arb.getPort()));
             newArb->LinkEndChild(port);
 
-            std::map<std::string, std::string> &rules = arb.getRuleMap();
+            std::map<std::string, ParamStrStream> &rules = arb.getRuleMap();
             for(auto& it : rules)
             {
                 auto* rule = new TiXmlElement("rule");
                 rule->SetAttribute("connection", it.first.c_str());
-                rule->LinkEndChild(new TiXmlText(it.second.c_str()));
+                rule->LinkEndChild(new TiXmlText(it.second.str().c_str()));
                 newArb->LinkEndChild(rule);
             }
 

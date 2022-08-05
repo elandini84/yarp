@@ -28,18 +28,19 @@ public:
     ~Arbitrator() = default;
 
     void setPort(const char* szPort) { if(szPort) { strPort = szPort; } }
+    void updateStringsParams(const std::map<std::string,std::string>& parameters) { strPort.updateParameters(parameters); }
 
-    const char* getPort() { return strPort.c_str(); }
+    const char* getPort() { return strPort.str().c_str(); }
 
     const char* getRule(const char* con)
     {
         if(con && (rules.find(con) != rules.end())) {
-            return rules[con].c_str();
+            return rules[con].str().c_str();
         }
         return nullptr;
     }
 
-    std::map<std::string, std::string>& getRuleMap() { return rules; }
+    std::map<std::string, ParamStrStream>& getRuleMap() { return rules; }
     int ruleCount() { return rules.size(); }
 
     GraphicModel* getModel() { return model;}
@@ -55,7 +56,7 @@ public:
     Node* owner() { return appOwner; }
 
     bool operator==(const Arbitrator& alt) const {
-        return (strPort == alt.strPort);
+        return (strPort.str() == alt.strPort.str());
     }
 
     std::map<std::string, double>& getAlphas( const char* con) {
@@ -75,8 +76,8 @@ public:
 protected:
 
 private:
-    std::string strPort;
-    std::map<std::string, std::string> rules;
+    ParamStrStream strPort;
+    std::map<std::string, ParamStrStream> rules;
     GraphicModel* model {nullptr};
     GraphicModel modelBase;
     Node* appOwner {nullptr};
