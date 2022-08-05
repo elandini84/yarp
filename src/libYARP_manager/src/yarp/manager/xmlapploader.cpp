@@ -537,9 +537,9 @@ Application* XmlAppLoader::parsXml(const char* szFile)
             TiXmlElement* prefix;
             if((name=(TiXmlElement*) embApp->FirstChild("name")))
             {
-                ApplicationInterface IApp(parser->parseText(name->GetText(),appParams).c_str());
+                ApplicationInterface IApp(parser->parseText(name->GetText()).c_str());
                 if ((prefix = (TiXmlElement*)embApp->FirstChild("prefix"))) {
-                    IApp.setPrefix(parser->parseText(prefix->GetText(),appParams).c_str());
+                    IApp.setPrefix(parser->parseText(prefix->GetText()).c_str());
                 }
 
                 for(TiXmlElement* apparam = embApp->FirstChildElement(); apparam; apparam = apparam->NextSiblingElement())
@@ -570,7 +570,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 auto* element = (TiXmlElement*) embApp->FirstChild("geometry");
                 if(element && element->GetText())
                 {
-                    yarp::os::Property prop(parser->parseText(element->GetText(),appParams).c_str());
+                    yarp::os::Property prop(parser->parseText(element->GetText()).c_str());
                     GraphicModel model;
                     GyPoint pt;
                     if(prop.check("Pos"))

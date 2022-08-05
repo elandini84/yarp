@@ -354,6 +354,7 @@ bool KnowledgeBase::makeupApplication(Application* application)
     for(int i=0; i<application->iapplicationCount(); i++)
     {
         ApplicationInterface interfaceApp = application->getIapplicationAt(i);
+        interfaceApp.updateStringsParameters(application->getAppParameters());
         if(std::string(interfaceApp.getName()) == std::string(application->getName()))
         {
             OSTRINGSTREAM msg;
