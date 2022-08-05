@@ -47,9 +47,10 @@ class ParamStrStream
 public:
     ParamStrStream();
     ParamStrStream(const std::string& str);
+    ParamStrStream(const yarp::manager::ParamStrStream&) = default;
     ~ParamStrStream();
-    std::string str();
-    std::string dummyStr();
+    std::string str() const;
+    std::string dummyStr() const;
     ParamStrStream& operator<<(ParamStrStream &oss);
     ParamStrStream& operator<<(const std::string &str);
     ParamStrStream& operator<<(int n);
@@ -59,8 +60,8 @@ public:
     ParamStrStream& operator = (const std::string &str);
     ParamStrStream& operator = (ParamStrStream &oss);
     ParamStrStream& operator = (int n);
-    void updateParameters(std::map<std::string,std::string> parameters);
-    std::string composeString();
+    void updateParameters(const std::map<std::string,std::string> &parameters);
+    std::string composeString() const;
     friend std::ostream& operator << (std::ostream &os , ParamStrStream& sstr);
 private:
     std::string m_dummyStr;

@@ -105,11 +105,11 @@ ParamStrStream::ParamStrStream(const std::string& str) {
 
 ParamStrStream::~ParamStrStream() = default;
 
-std::string ParamStrStream::str() {
+std::string ParamStrStream::str() const{
     return composeString();
 }
 
-std::string ParamStrStream::str() {
+std::string ParamStrStream::dummyStr() const{
     return m_dummyStr;
 }
 
@@ -190,13 +190,13 @@ bool ParamStrStream::isParameterValid(const std::string& paramName)
     return m_parameters.count(paramName) != 0;
 }
 
-void ParamStrStream::updateParameters(std::map<std::string, std::string> parameters)
+void ParamStrStream::updateParameters(const std::map<std::string,std::string> &parameters)
 {
     for(const auto& parPair : parameters)
     {
         if (isParameterValid(parPair.first))
         {
-            parameters[parPair.first] = parPair.second;
+            m_parameters[parPair.first] = parPair.second;
         }
     }
 }
@@ -225,7 +225,7 @@ void ParamStrStream::extractParameters(const std::string& input)
     }
 }
 
-std::string ParamStrStream::composeString()
+std::string ParamStrStream::composeString() const
 {
     size_t start = 0;
     size_t end = 0;
@@ -240,7 +240,7 @@ std::string ParamStrStream::composeString()
     {
         std::string envName;
         envName   = m_dummyStr.substr(start + startKeyword.size(), end - start -startKeyword.size());
-        outputString = m_dummyStr.substr(0, start) + m_parameters[envName] + m_dummyStr.substr(end + endKeyword.size(), m_dummyStr.size() - endKeyword.size());
+        outputString = m_dummyStr.substr(0, start) + m_parameters.at(envName) + m_dummyStr.substr(end + endKeyword.size(), m_dummyStr.size() - endKeyword.size());
         start = m_dummyStr.find(startKeyword);
         end = m_dummyStr.find(endKeyword, start);
     }
