@@ -90,4 +90,10 @@ bool ResYarpPort::satisfy(GenericResource* resource)
             strPort.str() == std::string(resport->getName()) );
 }
 
+void ResYarpPort::updateStringsParams(const std::map<std::string,std::string>& parameters) {
+    strPort.updateParameters(parameters);
+    strRequest.updateParameters(parameters);
+    strReply.updateParameters(parameters);
+}
+
 ResYarpPort::~ResYarpPort() = default;

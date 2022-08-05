@@ -333,7 +333,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                 {
                     ResYarpPort resource(parser->smartParseText(res->GetText()).dummyStr().c_str());
                     resource.setPort(parser->smartParseText(res->GetText()).dummyStr().c_str());
-                    resource.updatePortParams(appParams);
+                    resource.updateStringsParams(appParams);
                     app.addResource(resource);
                 }
             }
@@ -435,8 +435,8 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                         {
                             if(res->GetText())
                             {
-                                ResYarpPort resource(parser->parseText(res->GetText(),appParams).c_str());
-                                resource.setPort(parser->parseText(res->GetText(),appParams).c_str());
+                                ResYarpPort resource(parser->parseText(res->GetText()).c_str());
+                                resource.setPort(parser->parseText(res->GetText()).c_str());
                                 if (res->Attribute("timeout")) {
                                     resource.setTimeout(atof(res->Attribute("timeout")));
                                 }
@@ -688,8 +688,8 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                     connection.setFromExternal(true);
                     if(from->GetText())
                     {
-                        ResYarpPort resource(parser->parseText(from->GetText(),appParams).c_str());
-                        resource.setPort(parser->parseText(from->GetText(),appParams).c_str());
+                        ResYarpPort resource(parser->parseText(from->GetText()).c_str());
+                        resource.setPort(parser->parseText(from->GetText()).c_str());
                         app.addResource(resource);
                     }
                 }
@@ -702,8 +702,8 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                     if(to->GetText())
                     {
                         connection.setToExternal(true);
-                        ResYarpPort resource(parser->parseText(to->GetText(),appParams).c_str());
-                        resource.setPort(parser->parseText(to->GetText(),appParams).c_str());
+                        ResYarpPort resource(parser->parseText(to->GetText()).c_str());
+                        resource.setPort(parser->parseText(to->GetText()).c_str());
                         app.addResource(resource);
                     }
                 }

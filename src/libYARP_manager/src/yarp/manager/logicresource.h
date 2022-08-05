@@ -46,12 +46,12 @@ public:
     ResYarpPort(const char* szName);
     ~ResYarpPort() override;
     void setPort(const char* szPort) { if(szPort) { strPort = szPort; } }
-    void updatePortParams(std::map<std::string,std::string> parameters) { strPort.updateParameters(parameters); }
+    void updateStringsParams(const std::map<std::string,std::string>& parameters);
     const char* getPort() { return strPort.str().c_str(); }
     void setRequest(const char* szReq) { if(szReq) { strRequest = szReq; } }
     void setReply(const char* szRep) { if(szRep) { strReply = szRep; } }
-    const char* getRequest() { return strRequest.c_str(); }
-    const char* getReply() { return strReply.c_str(); }
+    const char* getRequest() { return strRequest.str().c_str(); }
+    const char* getReply() { return strReply.str().c_str(); }
     void setTimeout(double t) { timeout = t; }
     double getTimeout() { return timeout; }
     Node* clone() override;
@@ -61,8 +61,8 @@ protected:
 
 private:
     ParamStrStream strPort;
-    std::string strRequest;
-    std::string strReply;
+    ParamStrStream strRequest;
+    ParamStrStream strReply;
     double timeout;
 };
 
