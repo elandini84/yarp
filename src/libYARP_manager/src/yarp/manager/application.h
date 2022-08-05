@@ -325,6 +325,7 @@ public:
     void removeAllIapplications() { Iapplications.clear(); }
 
     size_t appParametersCount() {return appParameters.size();}
+    std::map<std::string,std::string> getAppParameters() const { return appParameters; }
     bool getAppParameterAt(const std::string& paramName, std::string& paramValue);
     bool setAppParameterAt(const std::string& paramName, std::string paramValue);
     bool addAppParameter(std::string& paramName, std::string paramValue);
