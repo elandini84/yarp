@@ -31,17 +31,21 @@ public:
         if(szNew) { strNew = szNew; }
     }
     virtual ~Portmap() = default;
-    const char* oldPort() { return strOld.c_str(); }
-    const char* newPort() { return strNew.c_str(); }
+    const char* oldPort() { return strOld.str().c_str(); }
+    const char* newPort() { return strNew.str().c_str(); }
     bool operator==(const Portmap& alt) const {
-        return ((strOld == alt.strOld) && (strNew == alt.strNew));
+        return ((strOld.str() == alt.strOld.str()) && (strNew.str() == alt.strNew.str()));
+    }
+    void updateStringsParams(const std::map<std::string,std::string>& parameters) {
+        strOld.updateParameters(parameters);
+        strNew.updateParameters(parameters);
     }
 
 protected:
 
 private:
-    std::string strOld;
-    std::string strNew;
+    ParamStrStream strOld;
+    ParamStrStream strNew;
 };
 
 typedef std::vector<Portmap> PortmapContainer;

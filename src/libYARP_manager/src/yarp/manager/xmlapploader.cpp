@@ -508,7 +508,7 @@ Application* XmlAppLoader::parsXml(const char* szFile)
                         if((first=(TiXmlElement*) map->FirstChild("old")) &&
                            (second=(TiXmlElement*) map->FirstChild("new")) )
                         {
-                            Portmap portmap(parser->parseText(first->GetText(),appParams).c_str(), parser->parseText(second->GetText(),appParams).c_str());
+                            Portmap portmap(parser->parseText(first->GetText()).c_str(), parser->parseText(second->GetText()).c_str());
                             module.addPortmap(portmap);
                         }
                     }
