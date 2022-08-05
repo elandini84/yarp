@@ -438,6 +438,7 @@ bool KnowledgeBase::makeupApplication(Application* application)
             std::string strPort = std::string(application->getPrefix()) + std::string(cnn->to());
             cnn->setTo(strPort.c_str());
         }
+        cnn->updateStringsParameters(application->getAppParameters());
     }
 
     /**

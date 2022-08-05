@@ -76,11 +76,11 @@ public:
         model = nullptr;
     }
     virtual ~Connection() = default;
-    const char* from() { return strFrom.c_str();}
-    const char* to() { return strTo.c_str();}
-    const char* carrier() { return strCarrier.c_str(); }
-    const char* qosFrom() { return strQosFrom.c_str(); }
-    const char* qosTo() { return strQosTo.c_str(); }
+    const char* from() { return strFrom.str().c_str();}
+    const char* to() { return strTo.str().c_str();}
+    const char* carrier() { return strCarrier.str().c_str(); }
+    const char* qosFrom() { return strQosFrom.str().c_str(); }
+    const char* qosTo() { return strQosTo.str().c_str(); }
     void setFrom(const char* szFrom) { if(szFrom) { strFrom = szFrom; } }
     void setTo(const char* szTo) { if(szTo) { strTo = szTo; } }
     void setCarrier(const char* szCr) { if(szCr) { strCarrier = szCr; } }
@@ -96,10 +96,18 @@ public:
     bool isExternalFrom() { return bExternalFrom; }
     bool isExternalTo() { return bExternalTo; }
     bool isPersistent() { return bPersist; }
+    void updateStringsParameters(const std::map<std::string,std::string>& parameters) {
+        strFrom.updateParameters(parameters);
+        strTo.updateParameters(parameters);
+        strId.updateParameters(parameters);
+        strCarrier.updateParameters(parameters);
+        strQosFrom.updateParameters(parameters);
+        strQosTo.updateParameters(parameters);
+    }
 
 
     void setId(const char* id) { if(id) { strId = id; } }
-    const char* getId() { return strId.c_str(); }
+    const char* getId() { return strId.str().c_str(); }
 
     void setOwner(Node* owner){ appOwner = owner; }
     Node* owner() { return appOwner; }
@@ -123,22 +131,22 @@ public:
 
 
     bool operator==(const Connection& alt) const {
-        return ((strFrom == alt.strFrom) && (strTo == alt.strTo));
+        return ((strFrom.str() == alt.strFrom.str()) && (strTo.str() == alt.strTo.str()));
     }
 
 protected:
 
 private:
-    std::string strFrom;
-    std::string strTo;
-    std::string strId;
+    ParamStrStream strFrom;
+    ParamStrStream strTo;
+    ParamStrStream strId;
     bool bExternalTo;
     bool bExternalFrom;
     bool existsFrom;
     bool existsTo;
-    std::string strCarrier;
-    std::string strQosFrom;
-    std::string strQosTo;
+    ParamStrStream strCarrier;
+    ParamStrStream strQosFrom;
+    ParamStrStream strQosTo;
     bool bPersist;
     Node* appOwner;
     bool bWithPriority;
@@ -148,7 +156,6 @@ private:
     GraphicModel modelBase;
 
 };
-
 
 typedef std::vector<Connection> CnnContainer;
 typedef std::vector<Connection>::iterator CnnIterator;
