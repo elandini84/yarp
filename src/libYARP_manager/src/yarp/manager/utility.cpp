@@ -164,12 +164,12 @@ ParamStrStream& ParamStrStream::operator = (const std::string &str) {
     return *this;
 }
 
-ParamStrStream& ParamStrStream::operator = (ParamStrStream &oss) {
+/*ParamStrStream& ParamStrStream::operator = (ParamStrStream &oss) {
     m_parameters.clear();
     m_dummyStr = oss.str();
     extractParameters(oss.str());
     return *this;
-}
+}*/
 
 ParamStrStream& ParamStrStream::operator = (int n) {
     m_parameters.clear();

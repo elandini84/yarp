@@ -58,7 +58,7 @@ public:
     ParamStrStream& operator = (const char* sz);
     ParamStrStream& operator = (char* sz);
     ParamStrStream& operator = (const std::string &str);
-    ParamStrStream& operator = (ParamStrStream &oss);
+//    ParamStrStream& operator = (ParamStrStream &oss);
     ParamStrStream& operator = (int n);
     void updateParameters(const std::map<std::string,std::string> &parameters);
     std::string composeString() const;
