@@ -20,6 +20,7 @@ yarp_begin_plugin_library(yarpmod
   add_subdirectory(openNI2DepthCamera)
   add_subdirectory(fakeDepthCamera)
   add_subdirectory(fakebot)
+  add_subdirectory(fakeChatBotDevice)
   add_subdirectory(fakeMotionControl)
   add_subdirectory(fakeAnalogSensor)
   add_subdirectory(fakeBattery)
