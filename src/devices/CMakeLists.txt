@@ -47,6 +47,7 @@ yarp_begin_plugin_library(yarpmod
   add_subdirectory(portaudioPlayer)
   add_subdirectory(portaudioRecorder)
   add_subdirectory(imuBosch_BNO055)
+  add_subdirectory(IChatBotMsgs)
   add_subdirectory(ILLMMsgs)
   add_subdirectory(IAudioGrabberMsgs)
   add_subdirectory(IMap2DMsgs)
