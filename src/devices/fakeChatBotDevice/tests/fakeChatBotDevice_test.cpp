@@ -6,8 +6,8 @@
 #include <yarp/os/Network.h>
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/WrapperSingle.h>
-#include <yarp/dev/ILLM.h>
-#include <yarp/dev/tests/ILLMTest.h>
+#include <yarp/dev/IChatBot.h>
+#include <yarp/dev/tests/IChatBotTest.h>
 
 #include <catch2/catch_amalgamated.hpp>
 #include <harness.h>
@@ -21,24 +21,24 @@ TEST_CASE("dev::fakeChatBotDeviceTest", "[yarp::dev]")
 
     Network::setLocalMode(true);
 
-    SECTION("Checking fakeLLMdevice")
+    SECTION("Checking fakeChatBotdevice")
     {
-        PolyDriver fakellmdev;
-        ILLM* illm = nullptr;
+        PolyDriver fakeChatBotdev;
+        IChatBot* iChatBot = nullptr;
 
         ////////"Checking opening polydriver"
         {
-            Property llm_cfg;
-            llm_cfg.put("device", "fakeChatBotDevice");
-            REQUIRE(fakellmdev.open(llm_cfg));
-            REQUIRE(fakellmdev.view(illm));
+            Property chatBot_cfg;
+            chatBot_cfg.put("device", "fakeChatBotDevice");
+            REQUIRE(fakeChatBotdev.open(chatBot_cfg));
+            REQUIRE(fakeChatBotdev.view(iChatBot));
         }
 
         //execute tests
-        yarp::dev::tests::exec_iLLM_test_1(illm);
+        yarp::dev::tests::exec_iChatBot_test_1(iChatBot);
 
         //"Close all polydrivers and check"
-        CHECK(fakellmdev.close());
+        CHECK(fakeChatBotdev.close());
     }
 
     Network::setLocalMode(false);

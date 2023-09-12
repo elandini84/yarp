@@ -33,16 +33,6 @@ inline void exec_iChatBot_test_1(yarp::dev::IChatBot* ichatbot)
     std::string messageOut;
     b = ichatbot->interact(messageIn,messageOut);
     CHECK(b);
-
-    std::string tempBackUp;
-    b = ichatbot->backupBot(tempBackUp);
-    CHECK(b);
-
-    std::string tempBackUp2;
-    b = ichatbot->restoreBot(tempBackUp);
-    CHECK(b);
-    ichatbot->backupBot(tempBackUp2);
-    CHECK(tempBackUp2 == tempBackUp);
 }
 }
 

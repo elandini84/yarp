@@ -61,7 +61,7 @@ bool FakeChatBotDevice::setLanguage(const std::string& language)
     return true;
 }
 
-bool FakeChatBotDevice::getLanguage(std::string& language) const
+bool FakeChatBotDevice::getLanguage(std::string& language)
 {
     language = m_lang;
 
@@ -71,34 +71,5 @@ bool FakeChatBotDevice::getLanguage(std::string& language) const
 bool FakeChatBotDevice::resetBot()
 {
     m_status = "greetings";
-    return true;
-}
-
-bool FakeChatBotDevice::backupBot(std::string& backupString) const
-{
-    YARP_UNUSED(backupString);
-    backupString = "{";
-    for(auto& [status, ctx] : m_qAndA)
-    {
-        backupString += status;
-        backupString += ":\n{\n\t";
-        for(auto& [mIn, mOut] : ctx)
-        {
-            backupString += mIn;
-            backupString += ": ";
-            backupString += mOut;
-            backupString += ",\n";
-        }
-        backupString += "},\n";
-    }
-    backupString += "}";
-
-    return true;
-}
-
-bool FakeChatBotDevice::restoreBot(const std::string& botToRestore)
-{
-    YARP_UNUSED(botToRestore);
-    yCDebug(FAKECHATBOTDEVICE) << "Not implemented yet";
     return true;
 }

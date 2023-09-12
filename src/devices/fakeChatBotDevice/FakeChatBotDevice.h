@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FAKE_LLMDEVICE_H
-#define FAKE_LLMDEVICE_H
+#ifndef FAKE_CHATBOTDEVICE_H
+#define FAKE_CHATBOTDEVICE_H
 
 #include <yarp/dev/IChatBot.h>
 #include <vector>
@@ -25,10 +25,8 @@ public:
     FakeChatBotDevice();
     bool interact(const std::string& messageIn, std::string& messageOut) override;
     bool setLanguage(const std::string& language) override;
-    bool getLanguage(std::string& language) const override;
+    bool getLanguage(std::string& language) override;
     bool resetBot() override;
-    bool backupBot(std::string& backupString) const override;
-    bool restoreBot(const std::string& botToRestore) override;
 
 private:
     std::string m_currBot;
@@ -39,4 +37,4 @@ private:
     std::map<std::string, std::map<std::string,std::string>> m_qAndA;
 };
 
-#endif
+#endif // FAKE_CHATBOTDEVICE_H

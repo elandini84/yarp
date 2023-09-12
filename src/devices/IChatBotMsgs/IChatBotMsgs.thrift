@@ -13,16 +13,9 @@ struct return_getLanguage{
     2: string language;
 }
 
-struct return_backupBot{
-    1: bool result;
-    2: string backupString;
-}
-
 service IChatBotMsgs {
     return_interact interactRPC(1: string messageIn);
     bool setLanguageRPC(1: string language);
     return_getLanguage getLanguageRPC();
     bool resetBotRPC();
-    return_backupBot backupBotRPC();
-    bool restoreBotRPC(1: string botToRestore);
 }

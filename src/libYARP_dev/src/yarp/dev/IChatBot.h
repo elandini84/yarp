@@ -49,28 +49,13 @@ public:
      * \param language the returned string (code) representing the speech language (e.g. ita, eng...). Default value is "auto".
      * \return true on success
      */
-    virtual bool getLanguage(std::string& language) const = 0;
+    virtual bool getLanguage(std::string& language) = 0;
 
     /**
      * Resets the chatbot
      * \return true on success
     */
     virtual bool resetBot() = 0;
-
-    /**
-     * Downloads a backup of the chatbot.
-     * \param backupString a string (with chatbot implementation dependent formatting) that contains a full backup of the chatbot
-     * \return true on success
-     */
-    virtual bool backupBot(std::string& backupString) const = 0;
-
-    /**
-     * Restores a previous version of the chatbot
-     * \param botToRestore a string (with chatbot implementation dependent formatting) that contains a previously backed up version of the bot
-     * \return true on success
-     */
-    virtual bool restoreBot(const std::string& botToRestore) = 0;
-
 };
 
 

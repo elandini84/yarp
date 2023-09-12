@@ -13,7 +13,6 @@
 
 #include <yarp/os/Wire.h>
 #include <yarp/os/idl/WireTypes.h>
-#include <return_backupBot.h>
 #include <return_getLanguage.h>
 #include <return_interact.h>
 
@@ -31,10 +30,6 @@ public:
     virtual return_getLanguage getLanguageRPC();
 
     virtual bool resetBotRPC();
-
-    virtual return_backupBot backupBotRPC();
-
-    virtual bool restoreBotRPC(const std::string& botToRestore);
 
     // help method
     virtual std::vector<std::string> help(const std::string& functionName = "--all");
