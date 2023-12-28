@@ -430,6 +430,7 @@ MAKE_COMMS(Bottle)
 %include <yarp/dev/ISpeechSynthesizer.h>
 %include <yarp/dev/ISpeechTranscription.h>
 %include <yarp/dev/ILLM.h>
+%include <yarp/dev/ILocalization2D.h>
 %include <yarp/dev/MultipleAnalogSensorsInterfaces.h>
 
 #ifndef YARP_NO_DEPRECATED // Since YARP 3.5.0
@@ -826,6 +827,7 @@ typedef yarp::os::BufferedPort<ImageRgbFloat> BufferedPortImageRgbFloat;
     CAST_POLYDRIVER_TO_INTERFACE(ISpeechSynthesizer)
     CAST_POLYDRIVER_TO_INTERFACE(ISpeechTranscription)
     CAST_POLYDRIVER_TO_INTERFACE(ILLM)
+    CAST_POLYDRIVER_TO_INTERFACE(ILocalization2D)
 
 // These views are currently disabled in SWIG + java generator since they are
 // useless without the EXTENDED_ANALOG_SENSOR_INTERFACE part.
@@ -1587,6 +1589,64 @@ typedef yarp::os::BufferedPort<ImageRgbFloat> BufferedPortImageRgbFloat;
     bool ask(const std::string& question, std::vector<string>& answer) {
         return self->ask(question, answer[0]);
     }
+}
+
+%extend yarp::dev::ILocalization2D {
+    bool   startLocalizationService() {
+        return self->startLocalizationService();
+    }
+
+    bool   stopLocalizationService() {
+        return self->stopLocalizationService();
+    }
+
+    bool   getLocalizationStatus(LocalizationStatusEnum& status) {
+
+    }
+
+    // /**
+    //  * Gets a set of pose estimates computed by the localization algorithm.
+    //  * @return true/false
+    //  */
+    // virtual bool   getEstimatedPoses(std::vector<yarp::dev::Nav2D::Map2DLocation>& poses) = 0;
+
+    // /**
+    //  * Gets the current position of the robot w.r.t world reference frame
+    //  * @param loc the location of the robot
+    //  * @return true/false
+    //  */
+    // virtual bool   getCurrentPosition(yarp::dev::Nav2D::Map2DLocation& loc) = 0;
+
+    // /**
+    // * Gets the current position of the robot w.r.t world reference frame, plus the covariance
+    // * @param loc the location of the robot
+    // * @param cov the 3x3 covariance matrix
+    // * @return true/false
+    // */
+    // virtual bool   getCurrentPosition(yarp::dev::Nav2D::Map2DLocation& loc, yarp::sig::Matrix& cov) = 0;
+
+    // /**
+    // * Gets the estimated odometry the robot, including its velocity expressed in the world and in the local reference frame.
+    // * @param loc the estimated odometry.
+    // * @return true/false
+    // */
+    // virtual bool   getEstimatedOdometry(yarp::dev::OdometryData& odom) = 0;
+
+
+    // /**
+    //  * Sets the initial pose for the localization algorithm which estimates the current position of the robot w.r.t world reference frame.
+    //  * @param loc the location of the robot
+    //  * @return true/false
+    //  */
+    // virtual bool   setInitialPose(const yarp::dev::Nav2D::Map2DLocation& loc) = 0;
+
+    // /**
+    // * Sets the initial pose for the localization algorithm which estimates the current position of the robot w.r.t world reference frame.
+    // * @param loc the location of the robot
+    // * @param cov the 3x3 covariance matrix
+    // * @return true/false
+    // */
+    // virtual bool   setInitialPose(const yarp::dev::Nav2D::Map2DLocation& loc, const yarp::sig::Matrix& cov) = 0;
 }
 
 // This is part is currently broken in SWIG + java generator since SWIG 3.0.3
