@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>yarprobotinterface XML Builder</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-2: #edf4f1;
+  --ink: #1d2524;
+  --muted: #5d6a66;
+  --line: #cfd8d3;
+  --accent: #0b7a75;
+  --accent-dark: #075c58;
+  --warn: #a45b08;
+  --danger: #9b2d20;
+  --ok: #2c6e49;
+  --shadow: 0 14px 32px rgba(34, 45, 42, 0.10);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); }
+button, input, select, textarea { font: inherit; }
+button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-height: 2.35rem; padding: 0.45rem 0.75rem; border-radius: 6px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover { background: var(--accent-dark); }
+button.danger { color: var(--danger); }
+button:disabled, select:disabled, input:disabled { opacity: 0.55; cursor: not-allowed; }
+input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); min-height: 2.35rem; padding: 0.45rem 0.55rem; }
+textarea { min-height: 28rem; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; line-height: 1.45; font-size: 0.88rem; }
+label { display: grid; gap: 0.35rem; color: var(--muted); font-size: 0.85rem; }
+label > span:first-child { font-weight: 650; color: var(--ink); }
+.app { display: grid; grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr); min-height: 100vh; }
+.left, .right { padding: 1rem; }
+.left { border-right: 1px solid var(--line); overflow-y: auto; }
+.right { display: grid; grid-template-rows: auto 1fr; gap: 1rem; min-width: 0; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+h1 { margin: 0; font-size: 1.2rem; letter-spacing: 0; }
+.meta { color: var(--muted); font-size: 0.82rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 1rem; }
+.stack { display: grid; gap: 1rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+.row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.row.nowrap { flex-wrap: nowrap; }
+.badge { display: inline-flex; align-items: center; min-height: 1.4rem; border: 1px solid var(--line); border-radius: 999px; padding: 0.12rem 0.45rem; color: var(--muted); font-size: 0.76rem; white-space: nowrap; }
+.badge.required { color: #fff; background: var(--warn); border-color: var(--warn); }
+.badge.optional { color: var(--accent-dark); background: var(--surface-2); border-color: #b8d8d2; }
+.section-title { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.8rem; }
+.section-title h2 { font-size: 1rem; margin: 0; }
+.device-summary { color: var(--muted); font-size: 0.85rem; line-height: 1.45; }
+.param-group { display: grid; gap: 0.7rem; }
+.param-heading { margin-top: 0.25rem; padding-top: 0.7rem; border-top: 1px solid var(--line); font-weight: 700; color: var(--accent-dark); }
+.param-row { display: grid; grid-template-columns: minmax(9rem, 0.8fr) minmax(10rem, 1fr); gap: 0.7rem; align-items: start; padding: 0.7rem; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfb; }
+.param-row.optional-off { background: #f5f7f6; }
+.param-name { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; min-width: 0; }
+.param-name strong { overflow-wrap: anywhere; }
+.param-doc { color: var(--muted); font-size: 0.78rem; line-height: 1.35; margin-top: 0.3rem; }
+.checkline { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); font-size: 0.8rem; }
+.checkline input { width: auto; min-height: auto; }
+.attach-list { display: grid; gap: 0.5rem; }
+.attach-target { display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(7rem, 1fr) auto; gap: 0.5rem; align-items: end; }
+.manual-param-row { display: grid; grid-template-columns: minmax(6rem, 0.8fr) minmax(7rem, 1fr) minmax(8rem, 1.2fr) auto; gap: 0.5rem; align-items: end; }
+.multi-select { min-height: 7.5rem; }
+.external-list { display: grid; gap: 0.45rem; }
+.external-item { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem 0.65rem; background: #fbfcfb; }
+.external-item small { color: var(--muted); overflow-wrap: anywhere; }
+.device-list { display: grid; gap: 0.5rem; }
+.device-item { display: grid; grid-template-columns: 1fr auto; gap: 0.7rem; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 0.65rem; background: #fbfcfb; }
+.device-item strong { display: block; overflow-wrap: anywhere; }
+.device-item small { color: var(--muted); }
+.preview-tools { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
+.status { min-height: 1.4rem; color: var(--muted); font-size: 0.84rem; }
+.status.error { color: var(--danger); font-weight: 650; }
+.status.ok { color: var(--ok); font-weight: 650; }
+.hidden { display: none !important; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .left { border-right: 0; border-bottom: 1px solid var(--line); }
+  .right { min-height: 70vh; }
+}
+@media (max-width: 640px) {
+  .grid-2, .grid-3, .param-row, .attach-target, .manual-param-row { grid-template-columns: 1fr; }
+  .topbar, .section-title { align-items: flex-start; flex-direction: column; }
+  .left, .right { padding: 0.75rem; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="left stack">
+    <div class="topbar">
+      <div>
+        <h1>yarprobotinterface XML Builder</h1>
+        <div class="meta" id="catalogMeta"></div>
+      </div>
+    </div>
+
+    <section class="panel stack" aria-labelledby="robotSettingsTitle">
+      <div class="section-title"><h2 id="robotSettingsTitle">Robot</h2></div>
+      <div class="grid-3">
+        <label><span>Robot name</span><input id="robotName" value="robotinterfaceExample" required></label>
+        <label><span>Port prefix</span><input id="portPrefix" value="/robot"></label>
+        <label><span>Build</span><input id="buildValue" value="0"></label>
+      </div>
+    </section>
+
+    <section class="panel stack" aria-labelledby="externalPluginsTitle">
+      <div class="section-title"><h2 id="externalPluginsTitle">External Plugins</h2><span class="badge" id="externalCountBadge">0 imported</span></div>
+      <div class="row">
+        <button id="chooseYarpDataDirButton">Choose YARP data dir</button>
+        <button id="chooseManifestFilesButton">Choose manifest files</button>
+      </div>
+      <input id="yarpDataDirInput" class="hidden" type="file" webkitdirectory directory multiple>
+      <input id="manifestFilesInput" class="hidden" type="file" accept=".ini" multiple>
+      <div id="externalStatus" class="status" role="status"></div>
+      <div id="externalList" class="external-list"></div>
+    </section>
+
+    <section class="panel stack" aria-labelledby="deviceBuilderTitle">
+      <div class="section-title"><h2 id="deviceBuilderTitle">Device</h2><span class="badge" id="deviceCountBadge"></span></div>
+      <label><span>Abstract interface</span><select id="interfaceSelect"></select></label>
+      <label><span>Device type</span><select id="deviceSelect" disabled></select></label>
+      <div id="deviceSummary" class="device-summary"></div>
+      <label><span>XML instance name</span><input id="instanceName" placeholder="example_device" required></label>
+      <div id="paramsHost" class="param-group"></div>
+      <div id="attachHost" class="stack hidden"></div>
+      <div class="row">
+        <button id="addDeviceButton" class="primary" disabled>Add device</button>
+        <button id="resetFormButton">Reset form</button>
+      </div>
+      <div id="formStatus" class="status" role="status"></div>
+    </section>
+
+    <section class="panel stack" aria-labelledby="addedDevicesTitle">
+      <div class="section-title"><h2 id="addedDevicesTitle">Added Devices</h2><button id="clearButton" class="danger">Clear</button></div>
+      <div id="deviceList" class="device-list"></div>
+    </section>
+  </main>
+
+  <aside class="right">
+    <section class="panel">
+      <div class="section-title">
+        <h2>XML</h2>
+        <div class="preview-tools">
+          <button id="copyButton">Copy</button>
+          <button id="downloadButton">Download</button>
+        </div>
+      </div>
+      <div id="previewStatus" class="status"></div>
+    </section>
+    <textarea id="xmlPreview" spellcheck="false" aria-label="Generated XML"></textarea>
+  </aside>
+</div>
+
+<script id="catalog-data" type="application/json">{"generated":"2026-06-23","schema":1,"interfaces":["IAmplifierControl","IAmplifierControlRaw","IAnalogSensor","IAudioGrabberSound","IAudioRender","IAudioVisualGrabber","IAudioVisualStream","IAxisInfo","IAxisInfoRaw","IBattery","ICalibrator","ICanBufferFactory","ICanBus","ICanBusErrors","ICartesianControl","IChatBot","IContactLoadCellArrays","IControlCalibration","IControlCalibrationRaw","IControlDebug","IControlLimits","IControlLimitsRaw","IControlMode","IControlModeRaw","ICurrentControl","ICurrentControlRaw","IDepthVisualParams","IEncoderArrays","IEncoders","IEncodersRaw","IEncodersTimed","IEncodersTimedRaw","IFrameGrabberControls","IFrameGrabberControlsDC1394","IFrameGrabberImage","IFrameGrabberImageBase","IFrameGrabberImageRaw","IFrameGrabberOf","IFrameTransform","IFrameTransformClientControl","IFrameTransformStorageGet","IFrameTransformStorageSet","IFrameTransformStorageUtils","IFrameWriterAudioVisual","IFrameWriterImage","IGPUDevice","IGazeControl","IGenericSensor","IHapticDevice","IImpedanceControl","IImpedanceControlRaw","IInteractionMode","IInteractionModeRaw","IJacobianCoupling","IJointBrake","IJointBrakeRaw","IJointCoupling","IJointFault","IJointFaultRaw","IJoypadController","ILLM","ILinearVelocitySensors","ILocalization2D","IMap2D","IMotor","IMotorEncoders","IMotorEncodersRaw","IMotorRaw","IMultipleWrapper","INavigation2D","INavigation2DControlActions","INavigation2DExtraActions","INavigation2DTargetActions","INavigation2DVelocityActions","IOdometry2D","IOrientationSensors","IPWMControl","IPWMControlRaw","IPidControl","IPidControlRaw","IPositionControl","IPositionControlRaw","IPositionDirect","IPositionDirectRaw","IPositionSensors","IPreciselyTimed","IRGBDSensor","IRangefinder2D","IRemoteCalibrator","IRemoteVariables","IRemoteVariablesRaw","IRgbVisualParams","IRobotDescription","ISerialDevice","ISimulatedWorld","ISixAxisForceTorqueSensors","ISkinPatches","ISpeechSynthesizer","ISpeechTranscription","ITemperatureSensors","IThreeAxisAngularAccelerometers","IThreeAxisGyroscopes","IThreeAxisLinearAccelerometers","IThreeAxisMagnetometers","ITorqueControl","ITorqueControlRaw","IVelocityControl","IVelocityControlRaw","IVelocityDirect","IVelocityDirectRaw","IVirtualAnalogSensor","IVirtualAnalogSensorRaw","IVisualServoing","IWrapper"],"devices":[{"n":"audioFromFileDevice","c":"AudioFromFileDevice","p":"src/devices/audioFromFileDevice","w":"AudioRecorderWrapper","i":[3],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","use_params_from_file","bool","","true",0,"If set to true, recording params (e.g. channels, freq etc. are taken from file. Otherwise are AUDIO_BASE parameters are used and the file is converted to the specified format",""],["","file_name","string","","audio.wav",0,"The name of the file opened by the module","Only .wav files supported"],["","period","double","s","0.010",0,"the period of thread which processes the file","On each iteration xxx samples are processed"],["","driver_frame_size","int","samples","512",0,"the number of samples to process on each iteration of the thread",""],["","reset_on_stop","bool","","false",0,"if enabled, the file is played back from the beginning every stop. Otherwise on start the previous position is resumed",""]]},{"n":"AudioPlayerWrapper","c":"AudioPlayerWrapper","p":"src/devices/networkWrappers/audioPlayerWrapper","w":"AudioPlayerWrapper","i":[68,113],"q":[4],"x":["audioToFileDevice","fakeSpeaker","portaudioPlayer"],"s":1,"m":1,"a":1,"r":[["","name","string","","/audioPlayerWrapper",0,"prefix of the ports opened by the device","xxx/audio:i, xxx/rpc:i, xxx/status:o, ports are opened"],["","period","float","s","0.02",0,"period of the internal thread, in s",""],["","debug","bool","","false",0,"developers use only",""],["","playback_network_buffer_size","double","s","5.0",0,"size of the audio buffer in seconds, increasing this value to robustify the real-time audio stream (it will increase latency too)","Audio playback will start when the buffer is full"],["","start","bool","","false",0,"automatically activates the playback when the device is started","if false, the playback is enabled via rpc port"]]},{"n":"audioRecorder_nwc_yarp","c":"AudioRecorder_nwc_yarp","p":"src/devices/networkWrappers/audioRecorder_nwc_yarp","w":"","i":[3],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the audioRecoder_nwc_yarp device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the audioRecoder_nwc_yarp connects to.",""],["","carrier","string","","fast_tcp",0,"The carrier used for the streaming connection with the server.",""],["","useStream","bool","","false",0,"If true, enables a streaming connection with the server. Otherwise only rpc is used",""]]},{"n":"audioRecorder_nws_ros2","c":"yarp_audioRecorder_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/audioRecorder_nws_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/audioRecorder_nws_ros2.ini","library":"yarp_audioRecorder_nws_ros2","fields":{"type":"device","name":"audioRecorder_nws_ros2","library":"yarp_audioRecorder_nws_ros2"}}},{"n":"audioRecorder_nws_yarp","c":"AudioRecorder_nws_yarp","p":"src/devices/networkWrappers/audioRecorder_nws_yarp","w":"","i":[68,113],"q":[3],"x":["audioFromFileDevice","fakeMicrophone","portaudio","portaudioRecorder"],"s":1,"m":1,"a":1,"r":[["","name","string","","/audioRecorder_nws",0,"full name of the port opened by the device","MUST start with a '/' character, xxx/audio:o and xxx/rpc suffixes are appended"],["","period","float","s","0.02",0,"period of the internal thread, in ms","default 20ms"],["","debug","bool","","false",0,"developers use only",""],["","min_samples_over_network","size_t","samples","11250",0,"sends the network packet ifs n samples are collected AND the timeout is expired","the algorithm is implemented in AudioRecorderDeviceBase::getSound() method"],["","max_samples_over_network","size_t","samples","11250",0,"sends the network packet as soon as n samples have been collected","the algorithm is implemented in AudioRecorderDeviceBase::getSound() method"],["","max_samples_timeout","float","s","1.0",0,"timeout for sample collection","the algorithm is implemented in AudioRecorderDeviceBase::getSound() method"],["","start","bool","","false",0,"automatically activates the recording when the device is started","if false, the recording is enabled via rpc port"],["","send_sound_on_stop","bool","","true",0,"send the sound when the stop rpc is called, even if it does not met network size parameters","it will not send empty sounds"]]},{"n":"audioToFileDevice","c":"AudioToFileDevice","p":"src/devices/audioToFileDevice","w":"AudioPlayerWrapper","i":[4],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","file_name","string","","audio_out.wav",0,"The name of the file written by the module","Only .wav and .mp3 files are supported"],["","save_mode","string","","overwrite_file",0,"Affects the behavior of the module and defines the save mode, as described in the documentation.",""],["","add_marker","bool","","false",0,"If set, it will add a marker at the beginning and at the ending of each received waveform.",""]]},{"n":"battery_nwc_yarp","c":"Battery_nwc_yarp","p":"src/devices/networkWrappers/battery_nwc_yarp","w":"","i":[9,85],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the nwc device.",""],["","remote","string","","",1,"Full port name of the port remotely opened by the nws device, to which the nwc connects to.",""],["","rpc_carrier","string","","fast_tcp",0,"The carrier used for the RPC connection with the server.",""],["","rpc_timeout","double","[s]","-1",0,"Timeout for RPC calls. Default value: -1 = infinite",""],["","carrier","string","","fast_tcp",0,"The carrier used for the streaming connection with the server.",""]]},{"n":"battery_nws_ros2","c":"yarp_battery_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/battery_nws_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/battery_nws_ros2.ini","library":"yarp_battery_nws_ros2","fields":{"type":"device","name":"battery_nws_ros2","library":"yarp_battery_nws_ros2"}}},{"n":"battery_nws_yarp","c":"Battery_nws_yarp","p":"src/devices/networkWrappers/battery_nws_yarp","w":"battery_nws_yarp","i":[68,113],"q":[9],"x":["fakeBattery","upowerBattery"],"s":1,"m":1,"a":1,"r":[["","name","string","","/robotName/battery1",1,"prefix of the ports opened by the device","MUST start with a '/' character. /data:o and /rpc:i is automatically appended by the wrapper at the end"],["","period","double","s","1.0",0,"refresh period of the broadcasted values in seconds","optional, default 1.0s"],["","enable_shutdown","bool","","false",0,"if enabled, batteryWrapper will start a system shutdown when charge is below 5%",""],["","enable_log","bool","","false",0,"if enabled, stores a log of battery usage on disk","data stored on file batteryLog.txt"],["","quitPortName","string","","",0,"if present, this yarp port will be opened and used to send a sthutdown command to other processes","enable_shutdown must be enabled"]]},{"n":"cerDoubleLidar","c":"cerDoubleLidar","p":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/cerDoubleLidar.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/cerDoubleLidar.ini","library":"cerDoubleLidar","fields":{"type":"device","name":"cerDoubleLidar","library":"cerDoubleLidar"}}},{"n":"cerOdometry","c":"cerOdometry","p":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/cerOdometry.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/cerOdometry.ini","library":"cerOdometry","fields":{"type":"device","name":"cerOdometry","library":"cerOdometry"}}},{"n":"chatBot_nwc_yarp","c":"ChatBot_nwc_yarp","p":"src/devices/networkWrappers/chatBot_nwc_yarp","w":"","i":[15],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the nwc device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the nwc connects to.",""]]},{"n":"chatBot_nws_yarp","c":"ChatBot_nws_yarp","p":"src/devices/networkWrappers/chatBot_nws_yarp","w":"","i":[68,113],"q":[15],"x":[],"s":1,"m":1,"a":1,"r":[["","name","string","","/chatBot_nws",0,"prefix for all ports opened by the device","MUST start with a '/' character, xxx/text:i, xxx/text:o, xxx/rpc ports are opened"],["","streaming_name","string","","",0,"",""]]},{"n":"controlBoard_nws_ros2","c":"yarp_controlBoard_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/controlBoard_nws_ros2.ini","w":"controlBoard_nws_ros2","i":[68,113],"q":[],"x":["frameGrabber_nws_ros2"],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/controlBoard_nws_ros2.ini","library":"yarp_controlBoard_nws_ros2","fields":{"type":"device","name":"controlBoard_nws_ros2","library":"yarp_controlBoard_nws_ros2","wrapper":"controlBoard_nws_ros2"}}},{"n":"controlBoard_nws_yarp","c":"ControlBoard_nws_yarp","p":"src/devices/networkWrappers/controlBoard_nws_yarp","w":"controlBoard_nws_yarp","i":[68,113],"q":[0,7,17,20,22,24,30,49,51,54,57,64,65,76,78,80,82,85,88,89,104,106,108],"x":["controlBoardCouplingHandler","controlboardremapper","dynamixelAX12Ftdi","fakeMotionControl","fakeMotionControlMicro","remote_controlboard","remotecontrolboardremapper"],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.02",0,"period of the main thread",""],["","name","string","","/robot/part",1,"Prefix name of the ports opened by the device","opened ports will be: xxx/rpc:i xxx/command:i xxx/state:o xxx/stateExt:o"]]},{"n":"controlBoardCouplingHandler","c":"ControlBoardCouplingHandler","p":"src/devices/controlBoardCouplingHandler","w":"controlboard_nws_yarp","i":[7,28,30,68,113],"q":[7,30,56,85],"x":[],"s":1,"m":1,"a":1,"r":[["","coupling_device","string","","",1,"Name of the device that handles the coupling",""]]},{"n":"controlboardremapper","c":"ControlBoardRemapper","p":"src/devices/controlBoardRemapper","w":"controlBoard_nws_yarp","i":[0,7,17,20,22,24,28,30,49,51,54,57,64,65,68,76,78,80,82,85,88,89,104,106,108,113],"q":[0,7,17,20,22,24,28,30,49,51,54,57,64,65,76,78,80,82,85,88,89,104,106,108],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"couplingXCubHandMk5","c":"yarp_couplingXCubHandMk5","p":"/mnt/data/src/GIT/mesh-iit/ergocub-software/build/share/yarp/plugins/couplingXCubHandMk5.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/mesh-iit/ergocub-software/build/share/yarp/plugins/couplingXCubHandMk5.ini","library":"yarp_couplingXCubHandMk5","fields":{"type":"device","name":"couplingXCubHandMk5","library":"yarp_couplingXCubHandMk5"}}},{"n":"deviceBundler","c":"DeviceBundler","p":"src/devices/deviceBundler","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","wrapper_device","string","","device_name1",1,"Name of the wrapper device","This device must derive from yarp::dev::IWrapper"],["","attached_device","string","","device_name2",1,"Name of the subdevice that will be attached to the wrapper device",""],["","doNotAttach","bool","","false",0,"If set to true, the two devices are opened, but not attached","It should not be used, except for debugging purposes"]]},{"n":"dynamixelAX12Ftdi","c":"DynamixelAX12FtdiDriver","p":"src/devices/DynamixelAX12Ftdi","w":"controlboard","i":[28,80,104],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"fakeAnalogSensor","c":"FakeAnalogSensor","p":"src/devices/fake/fakeAnalogSensor","w":"analogServer","i":[2],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","1.0",0,"thread period",""],["","channelsNum","int","","1",0,"Number of channels",""]]},{"n":"fakeBattery","c":"FakeBattery","p":"src/devices/fake/fakeBattery","w":"batteryWrapper","i":[9],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.02",0,"thread period",""],["","charge","double","","50.0",0,"Initial charge",""],["","voltage","double","V","30.0",0,"Initial voltage",""],["","current","double","A","3.0",0,"Initial current",""],["","temperature","double","C","20.0",0,"Initial temperature",""],["","info","string","","Fake battery system v2.0",0,"Initial battery information",""],["","rpc_port_name","string","","/fakeBattery/rpc",0,"Full rpc port name",""]]},{"n":"fakeChatBotDevice","c":"FakeChatBotDevice","p":"src/devices/fake/fakeChatBotDevice","w":"","i":[15],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","language","string","","eng",0,"language code",""]]},{"n":"fakeDepthCamera","c":"FakeDepthCameraDriver","p":"src/devices/fake/fakeDepthCamera","w":"RGBDSensor_nws_yarp","i":[26,32,86,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","rgb_h","double","","480.0",0,"rgb_h",""],["","rgb_w","double","","640.0",0,"rgb_w",""],["","dep_h","double","","480.0",0,"dep_h","probably it should be identical to rgb_h"],["","dep_w","double","","640.0",0,"dep_w","probably it should be identical to rgb_w"],["","accuracy","double","","0.001",0,"accuracy",""],["","rgb_Vfov","double","","50.0",0,"rgb_Vfov",""],["","rgb_Hfov","double","","36.0",0,"rgb_Hfov",""],["","dep_Vfov","double","","50.0",0,"dep_Vfov",""],["","dep_Hfov","double","","36.0",0,"dep_Hfov",""],["","dep_near","double","","0.2",0,"dep_near",""],["","dep_far","double","","6.0",0,"dep_far",""]]},{"n":"fakeDepthCamera_mini","c":"FakeDepthCameraDriver_mini","p":"src/devices/fake/fakeDepthCamera","w":"rgbdSensor_nws_yarp","i":[26,86,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","rgb_h","double","","480.0",0,"rgb_h",""],["","rgb_w","double","","640.0",0,"rgb_w",""],["","dep_h","double","","480.0",0,"dep_h","probably it should be identical to rgb_h"],["","dep_w","double","","640.0",0,"dep_w","probably it should be identical to rgb_w"],["","accuracy","double","","0.001",0,"accuracy",""],["","rgb_Vfov","double","","50.0",0,"rgb_Vfov",""],["","rgb_Hfov","double","","36.0",0,"rgb_Hfov",""],["","dep_Vfov","double","","50.0",0,"dep_Vfov",""],["","dep_Hfov","double","","36.0",0,"dep_Hfov",""],["","dep_near","double","","0.2",0,"dep_near",""],["","dep_far","double","","6.0",0,"dep_far",""]]},{"n":"fakeDevice_nwc_yarp","c":"FakeDevice_nwc_yarp","p":"src/devices/fake/fakeDevice_nwc_yarp","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"fakeDevice_nws_yarp","c":"FakeDevice_nws_yarp","p":"src/devices/fake/fakeDevice_nws_yarp","w":"","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"fakeDeviceUnwrapped","c":"FakeDeviceUnwrapped","p":"src/devices/fake/fakeDeviceUnwrapped","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"fakeDeviceWrapped","c":"FakeDeviceWrapped","p":"src/devices/fake/fakeDeviceWrapped","w":"fakeDeviceWrapper","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"fakeDeviceWrapper","c":"FakeDeviceWrapper","p":"src/devices/fake/fakeDeviceWrapper","w":"","i":[68,113],"q":[],"x":["fakeDeviceWrapped"],"s":1,"m":1,"a":1,"r":[]},{"n":"fakeFrameGrabber","c":"FakeFrameGrabber","p":"src/devices/fake/fakeFrameGrabber","w":"frameGrabber_nws_yarp","i":[32,33,36,85,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","width","int","","320",0,"desired width of test image",""],["","height","int","","240",0,"desired height of test image",""],["","horizontalFov","double","","1.0",0,"desired horizontal fov of test image",""],["","verticalFov","double","","2.0",0,"desired horizontal fov of test image",""],["","fakeFrameGrabber_rpc_port","string","","/fakeFrameGrabber/rpc",0,"rpc port for the fakeFrameGrabber",""],["","mirror","bool","","false",0,"mirror height of test image",""],["","syncro","bool","","false",0,"synchronize producer and consumer, so that all images are used once and only once",""],["","physFocalLength","double","","3.0",0,"Physical focal length",""],["","focalLengthX","double","","4.0",0,"Horizontal component of the focal length",""],["","focalLengthY","double","","5.0",0,"Vertical component of the focal length",""],["","principalPointX","double","","6.0",0,"X coordinate of the principal point",""],["","principalPointY","double","","7.0",0,"Y coordinate of the principal point",""],["","distortionModel","string","","FishEye",0,"Reference to group of parameters describing the distortion model of the camera",""],["","k1","double","","8.0",0,"Radial distortion coefficient of the lens(fake",""],["","k2","double","","9.0",0,"Radial distortion coefficient of the lens(fake)",""],["","k3","double","","10.0",0,"Radial distortion coefficient of the lens(fake)",""],["","t1","double","","11.0",0,"Tangential distortion of the lens(fake)",""],["","t2","double","","12.0",0,"Tangential distortion of the lens(fake)",""],["","freq","double","","0",0,"rate of test images in Hz",""],["","period","double","","0.033",0,"period of test images in seconds",""],["","mode","string","","line",0,"ball, line, grid, size, rand, none, time",""],["","src","string","","",0,"background image to use, if any","e.g. test.ppm"],["","add_timestamp","bool","","false",0,"should write the timestamp in the first bytes of the image",""],["","add_noise","bool","","false",0,"should add noise to the image (uses snr parameter)",""],["","bayer","bool","","false",0,"should emit bayer test image",""],["","mono","bool","","false",0,"should emit a monochrome image",""],["","snr","double","","0.5",0,"Signal noise ratio ([0.0-1.0]",""],["","rectificationMatrix","vector<double>","","(1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0)",0,"Matrix that describes the lens' distortion",""]]},{"n":"fakeFrameWriter","c":"FakeFrameWriter","p":"src/devices/fake/fakeFrameWriter","w":"frameWriter_nws_yarp","i":[44],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","filename","string","","output.avi",0,"output file name",""],["","framerate","double","","30",0,"framerate for the output file",""],["","width","int","","0",0,"frame width","if 0, it will automatically detected from the first received frame"],["","height","int","","0",0,"frame height","if 0, it will automatically detected from the first received frame"]]},{"n":"fakeIMU","c":"FakeIMU","p":"src/devices/fake/fakeIMU","w":"inertial","i":[75,101,102,103],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","int","millisecond","10",0,"Period over which the measurement is updated.",""],["","constantValue","bool","","false",0,"If the parameter is present, the fake sensor values never changes (useful for testing server/client coherence).",""],["","sensorName","string","","sensorName",0,"Name of the sensor",""],["","frameName","string","","frameName",0,"Name of the frame",""]]},{"n":"fakeJointCoupling","c":"FakeJointCoupling","p":"src/devices/fake/fakeJointCoupling","w":"","i":[56],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","rpc_port_name","string","","/fakeJointCoupling/rpc",0,"Full rpc port name",""]]},{"n":"fakeJoypad","c":"FakeJoypad","p":"src/devices/fake/fakeJoypad","w":"JoypadControlServer","i":[59],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","rpc_port_name","string","","/fakeJoypad/rpc",0,"Full rpc port name",""]]},{"n":"fakeLaser","c":"FakeLaser","p":"src/devices/fake/fakeLaser","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","test","string","","use_pattern",1,"Choose the modality","It can be one of the following: no_obstacles, use_pattern, use_mapfile, use_constant, use_square_trap"],["","localization_port","string","","/fakeLaser/location:i",0,"Full name of the port to which device connects to receive the localization data",""],["","localization_server","string","","/localizationServer",0,"Full name of the port to which device connects to receive the localization data",""],["","localization_client","string","","/fakeLaser/localizationClient",0,"Full name of the local transformClient opened by the device","It cannot be used togheter if localization_port parameter is set"],["","localization_device","string","","localization2DClient",0,"Type of localization device, e.g. localization2DClient, localization2D_nwc_yarp","It cannot be used togheter if localization_port parameter is set"],["MAP_MODE","map_file","string","","",0,"Full path to a .map file","Mandatory if --test use_mapfile option has been set"],["MAP_MODE","map_context","string","","",0,"Full path to a .map file","Mandatory if --test use_mapfile option has been set"],["","clip_max","double","m","3.5",0,"Maximum detectable distance for an obstacle",""],["","clip_min","double","m","0.1",0,"Minimum detectable distance for an obstacle",""],["GENERAL","period","double","s","0.02",0,"Thread period",""],["CONSTANT_MODE","const_distance","double","m","1",0,"Default const distance for mode use_constant",""]]},{"n":"fakeLaserWithMotor","c":"FakeLaserWithMotor","p":"src/devices/fake/fakeLaserWithMotor","w":"","i":[7,8,22,23,28,29,30,31,51,52,80,81,87,106,107],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","test","string","","use_pattern",1,"Choose the modality","It can be one of the following: no_obstacles, use_pattern, use_mapfile, use_constant, use_square_trap"],["","localization_port","string","","/fakeLaser/location:i",0,"Full name of the port to which device connects to receive the localization data",""],["","localization_server","string","","/localizationServer",0,"Full name of the port to which device connects to receive the localization data",""],["","localization_client","string","","/fakeLaser/localizationClient",0,"Full name of the local transformClient opened by the device","It cannot be used togheter if localization_port parameter is set"],["","localization_device","string","","localization2DClient",0,"Type of localization device, e.g. localization2DClient, localization2D_nwc_yarp","It cannot be used togheter if localization_port parameter is set"],["MAP_MODE","map_file","string","","",0,"Full path to a .map file","Mandatory if --test use_mapfile option has been set"],["MAP_MODE","map_context","string","","",0,"Full path to a .map file","Mandatory if --test use_mapfile option has been set"],["","clip_max","double","m","3.5",0,"Maximum detectable distance for an obstacle",""],["","clip_min","double","m","0.1",0,"Minimum detectable distance for an obstacle",""],["GENERAL","period","double","s","0.02",0,"Thread period",""],["CONSTANT_MODE","const_distance","double","m","1",0,"Default const distance for mode use_constant",""]]},{"n":"fakeLLMDevice","c":"FakeLLMDevice","p":"src/devices/fake/fakeLLMDevice","w":"","i":[60],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","initial_prompt","string","","",0,"intial prompt",""]]},{"n":"fakeLocalizer","c":"FakeLocalizer","p":"src/devices/fake/fakeLocalizerDevice","w":"","i":[62],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.010",0,"thread period","optional, default 1.0s"]]},{"n":"fakeMicrophone","c":"FakeMicrophone","p":"src/devices/fake/fakeMicrophone","w":"AudioRecorderWrapper","i":[3],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.010",0,"the period of processing thread","A value of 10ms is recommended. Do to not modify it"],["","waveform","string","","sine",0,"Defines the shape of the waveform. Can be one of the following: sine,sawtooth,square,constant",""],["","signal_frequency","int","Hz","440",0,"Frequency of the generated signal",""],["","signal_amplitude","int","","32000",0,"Amplitude of the generated signal",""],["","driver_frame_size","int","samples","512",0,"the number of samples to process on each iteration of the thread",""]]},{"n":"fakeMotionControl","c":"FakeMotionControl","p":"src/devices/fake/fakeMotionControl","w":"controlBoard_nws_yarp","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["GENERAL","Joints","int","","1",0,"Number of degrees of freedom",""],["GENERAL","AxisMap","vector<int>","","",0,"a list of reordered indices for the axes",""],["GENERAL","AxisName","vector<string>","","",0,"a list of strings representing the axes names",""],["GENERAL","AxisType","vector<string>","","",0,"a list of strings representing the axes type (revolute/prismatic)",""],["GENERAL","ampsToSensor","vector<double>","","",0,"a list of scales for the ampsToSensor conversion factors",""],["GENERAL","fullscalePWM","vector<double>","","",0,"a list of scales for the fullscalePWM conversion factors",""],["GENERAL","Encoder","vector<int>","","",0,"a list of scales for the encoders",""],["LIMITS","Max","vector<double>","deg","",0,"max encoder position",""],["LIMITS","Min","vector<double>","deg","",0,"min encoder position",""]]},{"n":"fakeMotionControlMicro","c":"FakeMotionControlMicro","p":"src/devices/fake/fakeMotionControlMicro","w":"controlBoard_nws_yarp","i":[7,8,28,29,30,31,57,58,65,66],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["GENERAL","Joints","int","","1",0,"Number of degrees of freedom",""],["GENERAL","AxisMap","vector<int>","","",0,"a list of reordered indices for the axes",""],["GENERAL","AxisName","vector<string>","","",0,"a list of strings representing the axes names",""],["GENERAL","AxisType","vector<string>","","",0,"a list of strings representing the axes type (revolute/prismatic)",""],["GENERAL","Encoder","vector<int>","","",0,"a list of scales for the encoders",""]]},{"n":"fakeNavigation","c":"FakeNavigation","p":"src/devices/fake/fakeNavigationDevice","w":"","i":[70,72,73],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","navigation_time","int","","500",0,"navigation_time",""],["","reached_time","int","","100",0,"reached_time",""]]},{"n":"fakeOdometry2D","c":"FakeOdometry2D","p":"src/devices/fake/fakeOdometry2D","w":"","i":[74],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.02",0,"thread period","optional, default 1.0s"]]},{"n":"fakePositionSensor","c":"FakePositionSensor","p":"src/devices/fake/fakePositionSensor","w":"multipleanalogsensorsserver","i":[75,84],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.01",0,"thread period","optional, default 1.0s"]]},{"n":"fakePythonSpeechTranscription","c":"FakePythonSpeechTranscription","p":"src/devices/fake/fakePythonSpeechTranscription","w":"","i":[98],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","language","string","","auto",0,"language code",""]]},{"n":"fakeSerialPort","c":"FakeSerialPort","p":"src/devices/fake/fakeSerialPort","w":"serialPort_nws_yarp","i":[93],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","comport","string","","COM3",1,"name of the serial channel","optional, default 1.0s"],["","verbose","int","","1",0,"Specifies if the device is in verbose mode (0/1)","optional, default 1.0s"],["","baudrate","int","","9600",1,"Specifies the baudrate at which the communication port operates","optional, default 1.0s"],["","xonlim","int","","0",0,"Specifies the minimum number of bytes in input buffer before XON char is sent","Negative value indicates that default value should be used (Win32)"],["","xofflim","int","","0",0,"Specifies the maximum number of bytes in input buffer before XOFF char is sent","Negative value indicates that default value should be used (Win32)"],["","readmincharacters","int","ms","1",0,"Specifies the minimum number of characters for non-canonical read (POSIX)","BEWARE: the exit condition for recv() function is readmincharacters && readtimeoutmsec."],["","readtimeoutmsec","int","ms","100",0,"Specifies the time to wait before returning from read. Negative value means infinite timeout","BEWARE: the exit condition for recv() function is readmincharacters && readtimeoutmsec."],["","paritymode","string","","EVEN",0,"Specifies the parity mode (EVEN, ODD, NONE","POSIX supports even and odd parity. Additionally Win32 supports mark and space parity modes"],["","ctsenb","int","","0",0,"Enable & set CTS mode","RTS & CTS are enabled/disabled together on some systems"],["","rtsenb","int","","0",0,"Enable & set RTS mode","RTS & CTS are enabled/disabled together on some systems. 0 = Disable RTS. 1 = Enable RTS. 2 = Enable RTS flow-control handshaking (Win32). 3 = Specifies that RTS line will be high if bytes are available for transmission. After transmission RTS will be low (Win32)"],["","xinenb","int","","0",0,"Enable/disable software flow control on input",""],["","xoutenb","int","","0",0,"Enable/disable software flow control on output.",""],["","modem","int","","0",0,"Specifies if device is a modem (POSIX). If not set modem status lines are ignored.",""],["","rcvenb","int","","0",0,"Enable/disable receiver (POSIX).",""],["","dsrenb","int","","0",0,"Controls whether DSR is disabled or enabled (Win32).",""],["","dtrdisable","int","","0",0,"Controls whether DTR is disabled or enabled",""],["","databits","int","s","7",0,"Data bits. Valid values 5, 6, 7 and 8 data bits. Additionally Win32 supports 4 data bits.",""],["","stopbits","int","s","1",0,"Stop bits. Valid values are 1 and 2.",""],["","line_terminator_char1","char","","'\r'",0,"line terminator character for receiveLine()",""],["","line_terminator_char2","char","","'\n'",0,"line terminator character for receiveLine()",""]]},{"n":"fakeSimulatedWorld","c":"FakeSimulatedWorld","p":"src/devices/fake/fakeSimulatedWorld","w":"","i":[94],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","int","millisecond","10",0,"Simulation Period",""]]},{"n":"fakeSpeaker","c":"FakeSpeaker","p":"src/devices/fake/fakeSpeaker","w":"AudioPlayerWrapper","i":[4],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.010",0,"the period of processing thread","A value of 10ms is recommended. Do to not modify it"]]},{"n":"fakeSpeechSynthesizer","c":"FakeSpeechSynthesizer","p":"src/devices/fake/fakeSpeechSynthesizer","w":"","i":[97],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","language","string","","auto",0,"language code",""],["","voice","string","","auto",0,"voice code",""],["","speed","double","","0.0",0,"speed",""],["","pitch","double","","0.0",0,"pitch",""]]},{"n":"fakeSpeechTranscription","c":"FakeSpeechTranscription","p":"src/devices/fake/fakeSpeechTranscription","w":"","i":[98],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","language","string","","auto",0,"language code",""]]},{"n":"frameGrabber_nwc_yarp","c":"FrameGrabber_nwc_yarp","p":"src/devices/networkWrappers/frameGrabber_nwc_yarp","w":"frameGrabber_nws_yarp","i":[32,33,35,37,85,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Prefix of the ports opened locally by the nwc for streaming and rpc operations",""],["","remote","string","","",1,"Name of the remote rpc port opened by the nws",""],["","carrier","string","","fast_tcp",0,"Protocol used for connection with the nws streaming port",""],["","no_stream","bool","","false",0,"Full port name of the port remotely opened by the Navigation server, to which the Navigation2D_nwc_yarp connects to.",""]]},{"n":"frameGrabber_nws_ros2","c":"yarp_frameGrabber_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameGrabber_nws_ros2.ini","w":"controlBoard_nws_ros2","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameGrabber_nws_ros2.ini","library":"yarp_frameGrabber_nws_ros2","fields":{"type":"device","name":"frameGrabber_nws_ros2","library":"yarp_frameGrabber_nws_ros2","wrapper":"controlBoard_nws_ros2"}}},{"n":"frameGrabber_nws_yarp","c":"FrameGrabber_nws_yarp","p":"src/devices/networkWrappers/frameGrabber_nws_yarp","w":"frameGrabber_nws_yarp","i":[68,113],"q":[32,33,34,36,85,91],"x":["fakeFrameGrabber","frameGrabberCropper","frameGrabber_nwc_yarp","openCVGrabber","usbCamera","usbCameraRaw"],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.033",0,"refresh period (in s) of the broadcasted values through yarp ports","default 0.03s"],["","name","string","","/grabber",0,"Prefix name of the ports opened by the FrameGrabber_nws_yarp","Required suffix like '/rpc' will be added by the device"],["","capabilities","string","","COLOR",0,"two capabilities supported, COLOR and RAW respectively for rgb and raw streaming",""],["","no_drop","bool","","true",0,"if present, use strict policy for sending data",""]]},{"n":"frameGrabberCropper","c":"FrameGrabberCropper","p":"src/devices/frameGrabberCropper","w":"frameGrabber_nws_yarp","i":[32,33,35,37,68,85,91,113],"q":[32,33,34,37,85,91],"x":[],"s":1,"m":1,"a":1,"r":[["","x1","int","","0",1,"x1",""],["","y1","int","","0",1,"y1",""],["","x2","int","","100",1,"x2",""],["","y2","int","","100",1,"y2",""],["","forwardRgbVisualParams","bool","","false",0,"Forward the the IRgbVisualParams calls to the attached device",""]]},{"n":"frameTransformClient","c":"FrameTransformClient","p":"src/devices/frameTransformClient","w":"","i":[38],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","testxml_from","string","","",0,"xml configuration file name","NB: FOR TEST ONLY."],["","testxml_context","string","","",0,"xml configuration file context","NB: FOR TEST ONLY."],["","filexml_option","string","","ftc_local_only.xml",0,"The name of the xml file containing the needed client configuration. if used, the name will be appended to config_xml/","it is mutually exclusive with testxml_from, testxml_context options"],["","local_rpc","string","","/ftClient/rpc",0,"Full name of the client rpc port",""],["","FrameTransform_verbose_debug","bool","","false",0,"Enable debug prints",""],["","period","double","s","0.10",0,"thread period",""]]},{"n":"frameTransformGet_nwc_ros2","c":"yarp_frameTransformGet_nwc_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameTransformGet_nwc_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameTransformGet_nwc_ros2.ini","library":"yarp_frameTransformGet_nwc_ros2","fields":{"type":"device","name":"frameTransformGet_nwc_ros2","library":"yarp_frameTransformGet_nwc_ros2"}}},{"n":"frameTransformGet_nwc_yarp","c":"FrameTransformGet_nwc_yarp","p":"src/devices/networkWrappers/frameTransformGet_nwc_yarp","w":"frameTransformGet_nws_yarp","i":[40],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"frameTransformGet_nws_yarp","c":"FrameTransformGet_nws_yarp","p":"src/devices/networkWrappers/frameTransformGet_nws_yarp","w":"frameTransformGet_nws_yarp","i":[68,113],"q":[40],"x":["frameTransformGetMultiplexer","frameTransformGet_nwc_yarp"],"s":1,"m":1,"a":1,"r":[]},{"n":"frameTransformGetMultiplexer","c":"FrameTransformGetMultiplexer","p":"src/devices/frameTransformGetMultiplexer","w":"frameTransformGet_nws_yarp","i":[40,68,113],"q":[40],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"frameTransformServer","c":"FrameTransformServer","p":"src/devices/frameTransformServer","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","testxml_from","string","","",0,"xml configuration file name","NB: FOR TEST ONLY."],["","testxml_context","string","","",0,"xml configuration file context","NB: FOR TEST ONLY."],["","filexml_option","string","","fts_yarp_only.xml",0,"The name of the xml file containing the needed configuration. if used, the name will be appended to config_xml/","it is mutually exclusive with testxml_from, testxml_context options"],["","local_rpc","string","","/ftServer/rpc",0,"Full name of the rpc port",""],["","FrameTransform_verbose_debug","bool","","false",0,"Enable debug prints",""],["","period","double","s","0.10",0,"thread period",""]]},{"n":"frameTransformSet_nwc_ros2","c":"yarp_frameTransformSet_nwc_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameTransformSet_nwc_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/frameTransformSet_nwc_ros2.ini","library":"yarp_frameTransformSet_nwc_ros2","fields":{"type":"device","name":"frameTransformSet_nwc_ros2","library":"yarp_frameTransformSet_nwc_ros2"}}},{"n":"frameTransformSet_nwc_yarp","c":"FrameTransformSet_nwc_yarp","p":"src/devices/networkWrappers/frameTransformSet_nwc_yarp","w":"frameTransformSet_nws_yarp","i":[41],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"frameTransformSet_nws_yarp","c":"FrameTransformSet_nws_yarp","p":"src/devices/networkWrappers/frameTransformSet_nws_yarp","w":"frameTransformSet_nws_yarp","i":[68,113],"q":[41,42],"x":["frameTransformSetMultiplexer","frameTransformSet_nwc_yarp"],"s":1,"m":1,"a":1,"r":[]},{"n":"frameTransformSetMultiplexer","c":"FrameTransformSetMultiplexer","p":"src/devices/frameTransformSetMultiplexer","w":"frameTransformSet_nws_yarp","i":[41,68,113],"q":[41,42],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"frameTransformStorage","c":"FrameTransformStorage","p":"src/devices/frameTransformStorage","w":"","i":[40,41,42,68,113],"q":[40,41,42],"x":[],"s":1,"m":1,"a":1,"r":[["","FrameTransform_verbose_debug","bool","","false",0,"Enables additinal debug print","NB: FOR TEST ONLY."],["","FrameTransform_container_timeout","double","s","0.2",0,"After this time, not-refreshed transforms will be deleted",""]]},{"n":"frameWriter_nws_yarp","c":"FrameWriter_nws_yarp","p":"src/devices/networkWrappers/frameWriter_nws_yarp","w":"frameWriter_nws_yarp","i":[68,113],"q":[44],"x":["fakeFrameWriter","openCVWriter"],"s":1,"m":1,"a":1,"r":[["","name","string","","/writer",0,"Prefix name of the ports opened by the FrameWriter_nws_yarp","Required suffix like '/rpc' will be added by the device"]]},{"n":"googleDialogFlowCxChatBot","c":"yarp_googleDialogFlowCxChatBot","p":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleDialogFlowCxChatBot.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleDialogFlowCxChatBot.ini","library":"yarp_googleDialogFlowCxChatBot","fields":{"type":"device","name":"googleDialogFlowCxChatBot","library":"yarp_googleDialogFlowCxChatBot"}}},{"n":"googleSpeechSynthesizer","c":"yarp_googleSpeechSynthesizer","p":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleSpeechSynthesizer.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleSpeechSynthesizer.ini","library":"yarp_googleSpeechSynthesizer","fields":{"type":"device","name":"googleSpeechSynthesizer","library":"yarp_googleSpeechSynthesizer"}}},{"n":"googleSpeechTranscription","c":"yarp_googleSpeechTranscription","p":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleSpeechTranscription.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-google-cloud/build/share/yarp/plugins/googleSpeechTranscription.ini","library":"yarp_googleSpeechTranscription","fields":{"type":"device","name":"googleSpeechTranscription","library":"yarp_googleSpeechTranscription"}}},{"n":"GPTDevice","c":"yarp_GPTDevice","p":"/mnt/data/src/GIT/robotology/yarp-devices-llm/build/share/yarp/plugins/GPTDevice.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-llm/build/share/yarp/plugins/GPTDevice.ini","library":"yarp_GPTDevice","fields":{"type":"device","name":"GPTDevice","library":"yarp_GPTDevice"}}},{"n":"hapticDevice_nws_ros2","c":"yarp_hapticDevice_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/hapticDevice_nws_ros2.ini","w":"hapticDevice_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/hapticDevice_nws_ros2.ini","library":"yarp_hapticDevice_nws_ros2","fields":{"type":"device","name":"hapticDevice_nws_ros2","library":"yarp_hapticDevice_nws_ros2","wrapper":"hapticDevice_nws_ros2"}}},{"n":"imu_nwc_ros2","c":"yarp_imu_nwc_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/imu_nwc_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/imu_nwc_ros2.ini","library":"yarp_imu_nwc_ros2","fields":{"type":"device","name":"imu_nwc_ros2","library":"yarp_imu_nwc_ros2"}}},{"n":"imu_nws_ros2","c":"yarp_imu_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/imu_nws_ros2.ini","w":"imu_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/imu_nws_ros2.ini","library":"yarp_imu_nws_ros2","fields":{"type":"device","name":"imu_nws_ros2","library":"yarp_imu_nws_ros2","wrapper":"imu_nws_ros2"}}},{"n":"imuBosch_BNO055","c":"BoschIMU","p":"src/devices/imuBosch_BNO055","w":"inertial","i":[47,75,101,102,103],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","comport","string","","",0,"full name of device file","ex '/dev/ttyUSB0', it is mutually exclusive with 'i2c' parameter"],["","baudrate","int","","115200",0,"baudrate setting of COM port","used only with serial configuration"],["","i2c","string","","",0,"full name of device file","ex '/dev/i2c-5', it is mutually exclusive with 'comport' parameter, necessary for i2c configuration"],["","period","int","ms","10",0,"period of the thread",""],["","sensor_name","string","","sensor_imu_bosch_bno055",0,"full name of the device",""],["","frame_name","string","","sensor_imu_bosch_bno055",0,"full name of the sensor frame in which the measurements are expressed",""],["","channels","int","","12",0,"number of channels in the output port. Default 12. If 16, also includes quaternion data",""]]},{"n":"imuFilter","c":"imuFilter","p":"/mnt/data/src/GIT/robotology/icub-main/build/share/iCub/plugins/imuFilter.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/icub-main/build/share/iCub/plugins/imuFilter.ini","library":"imuFilter","fields":{"type":"device","name":"imuFilter","library":"imuFilter"}}},{"n":"JoypadControl_nwc_yarp","c":"JoypadControl_nwc_yarp","p":"src/devices/networkWrappers/joypadControl_nwc_yarp","w":"JoypadControl_nwc_yarp","i":[59],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the client device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the client device connects to.",""],["","use_streaming","bool","","true",0,"enable/disables the use of streaming commands. If disabled, rpc is used instead",""]]},{"n":"JoypadControl_nws_yarp","c":"JoypadControl_nws_yarp","p":"src/devices/networkWrappers/joypadControl_nws_yarp","w":"JoypadControl_nws_yarp","i":[68,113],"q":[59],"x":[],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.01",0,"Refresh period (in s) of the broadcasted values through yarp ports",""],["","name","string","","/robotName/joypad",1,"Prefix name of the ports opened by the JoypadControlServer",""],["","use_separate_ports","bool","","true",0,"set it to 1 to use separate ports (buttons, axes, trackballs, hats) and 0 to stream all in one single port",""],["","profile","bool","","false",0,"print the joypad data for debugging purpose",""],["","publish_on_event","bool","","false",0,"if true, events, are published when the status changes (on event). Otherwise they are published at the frequency specified through the period parameter",""]]},{"n":"JoypadControlClient","c":"yarp_JoypadControlClient","p":"/mnt/data/src/GIT/robotology/yarp/build/share/yarp/plugins/JoypadControlClient.ini","w":"JoypadControlClient","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp/build/share/yarp/plugins/JoypadControlClient.ini","library":"yarp_JoypadControlClient","fields":{"type":"device","name":"JoypadControlClient","library":"yarp_JoypadControlClient","wrapper":"JoypadControlClient"}}},{"n":"JoypadControlServer","c":"yarp_JoypadControlServer","p":"/mnt/data/src/GIT/robotology/yarp/build/share/yarp/plugins/JoypadControlServer.ini","w":"JoypadControlServer","i":[59],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp/build/share/yarp/plugins/JoypadControlServer.ini","library":"yarp_JoypadControlServer","fields":{"type":"device","name":"JoypadControlServer","library":"yarp_JoypadControlServer","wrapper":"JoypadControlServer"}}},{"n":"laserFromDepth","c":"LaserFromDepth","p":"src/devices/laserFromDepth","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"laserFromExternalPort","c":"LaserFromExternalPort","p":"src/devices/laserFromExternalPort","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"laserFromPointCloud","c":"LaserFromPointCloud","p":"src/devices/laserFromPointCloud","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"laserHokuyo","c":"laserHokuyo","p":"src/devices/laserHokuyo","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"LLM_nwc_yarp","c":"LLM_nwc_yarp","p":"src/devices/networkWrappers/LLM_nwc_yarp","w":"","i":[60],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the nwc device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the nwc connects to.",""]]},{"n":"LLM_nws_yarp","c":"LLM_nws_yarp","p":"src/devices/networkWrappers/LLM_nws_yarp","w":"LLM_nws_yarp","i":[68,113],"q":[60],"x":[],"s":1,"m":1,"a":1,"r":[["","name","string","","/LLM_nws",1,"Prefix of the ports (rpc and streaming) opened by device","Two ports will be opened: xxx/rpc:i and xxx/conv:o"]]},{"n":"localization2D_nwc_yarp","c":"Localization2D_nwc_yarp","p":"src/devices/networkWrappers/localization2D_nwc_yarp","w":"","i":[62],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the Localization2D_nwc_yarp device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the Localization2D_nwc_yarp connects to.",""]]},{"n":"localization2D_nws_ros2","c":"yarp_localization2D_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/localization2D_nws_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/localization2D_nws_ros2.ini","library":"yarp_localization2D_nws_ros2","fields":{"type":"device","name":"localization2D_nws_ros2","library":"yarp_localization2D_nws_ros2"}}},{"n":"localization2D_nws_yarp","c":"Localization2D_nws_yarp","p":"src/devices/networkWrappers/localization2D_nws_yarp","w":"localization2D_nws_yarp","i":[68,113],"q":[38,62,63],"x":[],"s":1,"m":1,"a":1,"r":[["GENERAL","period","double","s","0.01",0,"The period of the working thread",""],["GENERAL","retrieve_position_periodically","bool","","true",0,"If true, the subdevice is asked periodically to retrieve the current location. Otherwise the current location is obtained asynchronously when a getCurrentPosition() command is issued.",""],["GENERAL","name","string","","/localization2D_nws_yarp",0,"The name of the server, used as a prefix for the opened ports","By default ports opened are /xxx/rpc and /xxx/streaming:o"],["GENERAL","publish_odometry","bool","","true",0,"Periodically publish odometry data over the network",""],["GENERAL","publish_location","bool","","true",0,"PEriodically publish location data over the network",""]]},{"n":"map2D_nwc_yarp","c":"Map2D_nwc_yarp","p":"src/devices/networkWrappers/map2D_nwc_yarp","w":"","i":[63],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the Map2D_nwc_yarp device.",""],["","remote","string","","",1,"Full port name of the port remotely opened by the Map2D_nws_yarp, to which the Map2D_nwc_yarp connects to.",""],["","carrier","string","","fast_tcp",0,"The carrier used for the connection with the server.",""]]},{"n":"map2D_nws_ros2","c":"yarp_map2D_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/map2D_nws_ros2.ini","w":"map2D_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/map2D_nws_ros2.ini","library":"yarp_map2D_nws_ros2","fields":{"type":"device","name":"map2D_nws_ros2","library":"yarp_map2D_nws_ros2","wrapper":"map2D_nws_ros2"}}},{"n":"map2D_nws_yarp","c":"Map2D_nws_yarp","p":"src/devices/networkWrappers/map2D_nws_yarp","w":"map2D_nws_yarp","i":[68,113],"q":[62,63,69],"x":["map2DStorage"],"s":1,"m":1,"a":1,"r":[["","name","string","","/map2D_nws_yarp/rpc",0,"Full name of the rpc port opened by the map2D_nws_yarp device.",""]]},{"n":"map2DStorage","c":"Map2DStorage","p":"src/devices/map2DStorage","w":"map2D_nws_yarp","i":[63],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","name","string","","/map2DStorage/rpc",0,"Full name of the rpc port opened by the device",""],["","mapCollectionContext","string","","",0,"The context where to find the maps and the locations files. If left empty, no file will be loaded.",""],["","mapCollectionFile","string","","maps_collection.ini",0,"The name of .ini file containing a map collection.",""],["","mapLocationsFile","string","","locations.ini",0,"The name of .ini file containing a list of locations.",""]]},{"n":"mobileBaseVelocityControl_nwc_yarp","c":"MobileBaseVelocityControl_nwc_yarp","p":"src/devices/networkWrappers/mobileBaseVelocityControl_nwc_yarp","w":"","i":[73],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the device.",""],["","server","string","","",1,"Full port name of the port remotely opened by the server, to which this client connects to.",""],["","carrier","string","","tcp",0,"The carier used for the connection with the server.",""]]},{"n":"mobileBaseVelocityControl_nws_ros2","c":"yarp_mobileBaseVelocityControl_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/mobileBaseVelocityControl_nws_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/mobileBaseVelocityControl_nws_ros2.ini","library":"yarp_mobileBaseVelocityControl_nws_ros2","fields":{"type":"device","name":"mobileBaseVelocityControl_nws_ros2","library":"yarp_mobileBaseVelocityControl_nws_ros2"}}},{"n":"mobileBaseVelocityControl_nws_yarp","c":"MobileBaseVelocityControl_nws_yarp","p":"src/devices/networkWrappers/mobileBaseVelocityControl_nws_yarp","w":"","i":[68,113],"q":[69,73],"x":[],"s":1,"m":1,"a":1,"r":[["","local","string","","/MobileBaseVelocityControl_nws",1,"Name of the port opened by the device. For both ports (i.e. /rpc:i, /data:i) the corresponding suffix is automatically added",""]]},{"n":"multipleanalogsensorsclient","c":"MultipleAnalogSensorsClient","p":"src/devices/networkWrappers/multipleanalogsensorsclient","w":"","i":[16,27,61,75,84,95,96,99,100,101,102,103],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","remote","string","","",1,"Prefix of the ports to which to connect, opened by MultipleAnalogSensorsServer device.",""],["","local","string","","",1,"Port prefix of the ports opened by this device.",""],["","timeout","double","s","0.02",0,"Timeout after which the device reports an error if no measurement was received.",""],["","externalConnection","bool","","false",0,"If set to true, the connection to the rpc port of the MAS server is skipped and it is possible to connect to the data source externally after being opened","Use case: e.g yarpdataplayer source. Note that with this configuration some information like sensor name, frame name and sensor number will be not available."],["","carrier","string","","tcp",0,"The carier used for the connection with the server.",""]]},{"n":"multipleanalogsensorsremapper","c":"MultipleAnalogSensorsRemapper","p":"src/devices/multipleanalogsensorsremapper","w":"","i":[16,27,61,68,75,84,95,96,99,100,101,102,103],"q":[16,27,61,75,84,95,96,99,100,101,102,103],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"multipleanalogsensorsserver","c":"MultipleAnalogSensorsServer","p":"src/devices/networkWrappers/multipleanalogsensorsserver","w":"multipleanalogsensorsserver","i":[68,113],"q":[16,27,61,75,84,95,96,99,100,101,102,103],"x":["fakeAnalogSensor","fakeIMU","fakePositionSensor","imuBosch_BNO055"],"s":1,"m":1,"a":1,"r":[["","name","string","","",1,"Prefix of the port opened by this device","MUST start with a '/' character"],["","period","int","ms","",1,"Refresh period of the broadcasted values in ms",""]]},{"n":"navigation2D_nwc_yarp","c":"Navigation2D_nwc_yarp","p":"src/devices/networkWrappers/navigation2D_nwc_yarp","w":"","i":[62,63,69,70,71,72,73],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the Navigation2D_nwc_yarp device.",""],["","navigation_server","string","","",1,"Full port name of the port remotely opened by the Navigation server, to which the Navigation2D_nwc_yarp connects to.",""],["","map_locations_server","string","","",1,"Full port name of the port remotely opened by the Map2DServer, to which the Navigation2D_nwc_yarp connects to.",""],["","localization_server","string","","",1,"Full port name of the port remotely opened by the Localization server, to which the Navigation2D_nwc_yarp connects to.",""]]},{"n":"navigation2D_nws_yarp","c":"Navigation2D_nws_yarp","p":"src/devices/networkWrappers/navigation2D_nws_yarp","w":"","i":[68,113],"q":[69,70,72,73],"x":[],"s":1,"m":1,"a":1,"r":[["GENERAL","period","double","s","0.01",0,"The period of the working thread",""],["GENERAL","name","string","","/navigation2D_nws_yarp",0,"The name of the server, used as a prefix for the opened ports",""]]},{"n":"odometry2D_nwc_yarp","c":"Odometry2D_nwc_yarp","p":"src/devices/networkWrappers/odometry2D_nwc_yarp","w":"","i":[74],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the Rangefinder2D_nwc_yarp device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the Rangefinder2D_nwc_yarp connects to.",""],["","carrier","string","","tcp",0,"The carrier used for the connection with the server.",""]]},{"n":"odometry2D_nws_ros2","c":"yarp_odometry2D_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/odometry2D_nws_ros2.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/odometry2D_nws_ros2.ini","library":"yarp_odometry2D_nws_ros2","fields":{"type":"device","name":"odometry2D_nws_ros2","library":"yarp_odometry2D_nws_ros2"}}},{"n":"odometry2D_nws_yarp","c":"Odometry2D_nws_yarp","p":"src/devices/networkWrappers/odometry2D_nws_yarp","w":"odometry2D_nws_yarp","i":[68,113],"q":[74],"x":[],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.02",0,"refresh period of the broadcasted values in s","default 0.02s"],["","name","string","","/odometry2D_nws_yarp",0,"The name of the server, used as a prefix for the opened ports",""]]},{"n":"openCVGrabber","c":"OpenCVGrabber","p":"src/devices/openCVGrabber","w":"frameGrabber_nws_yarp","i":[34,85],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","movie","string","","",0,"if present, read an .avi file instead of opening a camera",""],["","loop","bool","","false",0,"if true, and movie parameter is set, enable the loop playback of the file",""],["","camera","int","","0",0,"Id of the camera hardware device",""],["","framerate","double","","-1",0,"Framerate. Default value obtained by the hardware",""],["","width","int","","0",0,"Width of the frame. Default value obtained by the hardware",""],["","height","int","","0",0,"Height of the frame. Default value obtained by the hardware",""],["","flip_x","bool","","false",0,"Flip along the x axis",""],["","flip_y","bool","","false",0,"flip along the y axis",""],["","transpose","bool","","false",0,"Rotate the image by 90 degrees",""]]},{"n":"openCVWriter","c":"OpenCVWriter","p":"src/devices/openCVWriter","w":"frameWriter_nws_yarp","i":[44],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","filename","string","","output.avi",0,"output file name",""],["","framerate","double","","30",0,"framerate for the output file",""],["","width","int","","0",0,"frame width","if 0, it will automatically detected from the first received frame"],["","height","int","","0",0,"frame height","if 0, it will automatically detected from the first received frame"]]},{"n":"openNI2DepthCamera","c":"depthCameraDriver","p":"src/devices/openNI2DepthCamera","w":"rgbdSensor_nws_yarp","i":[26,32,86,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"portaudio","c":"PortAudioDeviceDriver","p":"src/devices/portaudio","w":"grabber","i":[3,4],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"portaudioPlayer","c":"PortAudioPlayerDeviceDriver","p":"src/devices/portaudioPlayer","w":"AudioPlayerWrapper","i":[4],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","audio_device_id","int","","-1",0,"The device id, if multiple sound cards are present","if not specified, the default system device will be used"],["","driver_frame_size","size_t","samples","512",0,"the number of samples to process on each iteration of the main thread",""]]},{"n":"portaudioRecorder","c":"PortAudioRecorderDeviceDriver","p":"src/devices/portaudioRecorder","w":"AudioRecorderWrapper","i":[3],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","audio_device_id","int","","-1",0,"The device id, if multiple sound cards are present","if not specified, the default system device will be used"],["","driver_frame_size","size_t","samples","512",0,"the number of samples to process on each iteration of the main thread",""]]},{"n":"rangefinder2D_controlBoard_nws_ros2","c":"yarp_rangefinder2D_controlBoard_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_controlBoard_nws_ros2.ini","w":"rangefinder2D_controlBoard_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_controlBoard_nws_ros2.ini","library":"yarp_rangefinder2D_controlBoard_nws_ros2","fields":{"type":"device","name":"rangefinder2D_controlBoard_nws_ros2","library":"yarp_rangefinder2D_controlBoard_nws_ros2","wrapper":"rangefinder2D_controlBoard_nws_ros2"}}},{"n":"rangefinder2D_nwc_ros2","c":"yarp_rangefinder2D_nwc_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_nwc_ros2.ini","w":"rangefinder2D_nwc_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_nwc_ros2.ini","library":"yarp_rangefinder2D_nwc_ros2","fields":{"type":"device","name":"rangefinder2D_nwc_ros2","library":"yarp_rangefinder2D_nwc_ros2","wrapper":"rangefinder2D_nwc_ros2"}}},{"n":"rangefinder2D_nwc_yarp","c":"Rangefinder2D_nwc_yarp","p":"src/devices/networkWrappers/rangefinder2D_nwc_yarp","w":"","i":[87],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the Rangefinder2D_nwc_yarp device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the Rangefinder2D_nwc_yarp connects to.",""],["","carrier","string","","tcp",0,"The carrier used for the connection with the server.",""]]},{"n":"rangefinder2D_nws_ros2","c":"yarp_rangefinder2D_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_nws_ros2.ini","w":"rangefinder2D_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rangefinder2D_nws_ros2.ini","library":"yarp_rangefinder2D_nws_ros2","fields":{"type":"device","name":"rangefinder2D_nws_ros2","library":"yarp_rangefinder2D_nws_ros2","wrapper":"rangefinder2D_nws_ros2"}}},{"n":"rangefinder2D_nws_yarp","c":"Rangefinder2D_nws_yarp","p":"src/devices/networkWrappers/rangefinder2D_nws_yarp","w":"rangefinder2D_nws_yarp","i":[68,113],"q":[87],"x":[],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.02",0,"refresh period of the broadcasted values in s","default 0.02s"],["","name","string","","",1,"Prefix name of the ports opened by the wrapper, e.g. /robotName/Rangefinder2DSensor","Required suffix like '/rpc' will be added by the device"],["","frame_id","string","","",0,"name of the attached frame","Currently not used, reserved for future use"]]},{"n":"rangefinder2DTransformer","c":"Rangefinder2DTransformer","p":"src/devices/Rangefinder2DTransformer","w":"","i":[68,87,113],"q":[38,87],"x":[],"s":1,"m":1,"a":1,"r":[["","device_position_x","double","m","0",0,"X coordinate of the virtual lidar",""],["","device_position_y","double","m","0",0,"Y coordinate of the virtual lidar",""],["","device_position_theta","double","deg","0",0,"Theta coordinate of the virtual lidar",""],["","laser_frame_name","string","","",0,"If present, open a frameTranformClient to get the robot->laser transform","If present, disables device_position_* parameters"],["","robot_frame_name","string","","",0,"If present, open a frameTranformClient to get the robot->laser transform","If present, disables device_position_* parameters"]]},{"n":"remote_controlboard","c":"RemoteControlBoard","p":"src/devices/networkWrappers/RemoteControlBoard","w":"controlBoard_nws_yarp","i":[0,7,17,20,22,24,28,30,49,51,54,57,64,65,76,78,80,82,85,88,89,104,106,108],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","remote","string","","",1,"Prefix of the port to which to connect.",""],["","local","string","","",1,"Port prefix of the port opened by this device.",""],["","writeStrict","string","","",0,"It can be 'on' or 'off'","See implementation"],["","carrier","string","","fast_tcp",0,"carrier used for receiving streamed robot state",""],["","carrier_cmd","string","","fast_tcp",0,"carrier used for sending streamed commands",""],["","timeout","float","","0.5",0,"timeout for the input port which receives the streamed robot state",""],["","use_streaming","bool","","true",0,"enable/disables the use of streaming commands. If disabled, rpc is used instead",""],["local_qos","enable","bool","","false",0,"Enable the usage of local Qos",""],["local_qos","thread_priority","int","","0",0,"Local Qos. See https://yarp.it/latest/channelprioritization.html",""],["local_qos","thread_policy","int","","0",0,"Local Qos. See https://yarp.it/latest/channelprioritization.html",""],["local_qos","packet_priority","string","","",0,"Local Qos. See https://yarp.it/latest/channelprioritization.html",""],["remote_qos","enable","bool","","false",0,"Enable the usage of remote Qos",""],["remote_qos","thread_priority","int","","0",0,"Remote Qos. See https://yarp.it/latest/channelprioritization.html",""],["remote_qos","thread_policy","int","","0",0,"Remote Qos. See https://yarp.it/latest/channelprioritization.html.",""],["remote_qos","packet_priority","string","","",0,"Remote Qos. See https://yarp.it/latest/channelprioritization.html.",""],["","diagnostic","bool","","false",0,"For development purpose only",""]]},{"n":"remotecontrolboardremapper","c":"RemoteControlBoardRemapper","p":"src/devices/controlBoardRemapper","w":"controlBoard_nws_yarp","i":[0,7,17,20,22,24,28,30,49,51,54,57,64,65,68,76,78,80,82,85,88,89,104,106,108,113],"q":[0,7,17,20,22,24,28,30,49,51,54,57,64,65,76,78,80,82,85,88,89,104,106,108],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"rgbdSensor_nwc_ros2","c":"yarp_rgbdSensor_nwc_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdSensor_nwc_ros2.ini","w":"rgbdSensor_nwc_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdSensor_nwc_ros2.ini","library":"yarp_rgbdSensor_nwc_ros2","fields":{"type":"device","name":"rgbdSensor_nwc_ros2","library":"yarp_rgbdSensor_nwc_ros2","wrapper":"rgbdSensor_nwc_ros2"}}},{"n":"RGBDSensor_nwc_yarp","c":"RGBDSensor_nwc_yarp","p":"src/devices/networkWrappers/RGBDSensor_nwc_yarp","w":"","i":[26,32,86,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","double","s","0.03",0,"refresh period (in s) of the broadcasted values through yarp ports","default 0.03s"],["","localImagePort","string","","/RGBD_nwc/Image:o",1,"Full name of the local image streaming port to open",""],["","localDepthPort","string","","/RGBD_nwc/Depth:o",1,"Full name of the local depth streaming port to open",""],["","remoteImagePort","string","","/RGBD_nws/Image:o",1,"Full name of the remote image port to connect to",""],["","remoteDepthPort","string","","/RGBD_nws/Depth:i",1,"Full name of the remote depth port to connect to",""],["","localRpcPort","string","","/RGBD_nwc/rpc:o",1,"Full name of the local rpc port to open",""],["","remoteRpcPort","string","","/RGBD_nws/rpc:i",1,"Full name of the remote rpc port to connect to",""],["","ImageCarrier","string","","udp",0,"Carrier for the image stream",""],["","DepthCarrier","string","","udp",0,"Carrier for the depth stream",""]]},{"n":"rgbdSensor_nws_ros2","c":"yarp_rgbdSensor_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdSensor_nws_ros2.ini","w":"rgbdSensor_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdSensor_nws_ros2.ini","library":"yarp_rgbdSensor_nws_ros2","fields":{"type":"device","name":"rgbdSensor_nws_ros2","library":"yarp_rgbdSensor_nws_ros2","wrapper":"rgbdSensor_nws_ros2"}}},{"n":"RGBDSensor_nws_yarp","c":"RGBDSensor_nws_yarp","p":"src/devices/networkWrappers/RGBDSensor_nws_yarp","w":"RGBDSensor_nws_yarp","i":[68,113],"q":[26,32,86,91],"x":["fakeDepthCamera","fakeDepthCamera_mini","openNI2DepthCamera"],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.02",0,"refresh period of the broadcasted values in s","default 0.02s"],["","name","string","","",1,"Prefix name of the ports opened by the RGBD wrapper, e.g. /robotName/RGBD","Required suffix like '/rpc' will be added by the device"]]},{"n":"rgbdToPointCloudSensor_nws_ros2","c":"yarp_rgbdToPointCloudSensor_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdToPointCloudSensor_nws_ros2.ini","w":"rgbdToPointCloudSensor_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/rgbdToPointCloudSensor_nws_ros2.ini","library":"yarp_rgbdToPointCloudSensor_nws_ros2","fields":{"type":"device","name":"rgbdToPointCloudSensor_nws_ros2","library":"yarp_rgbdToPointCloudSensor_nws_ros2","wrapper":"rgbdToPointCloudSensor_nws_ros2"}}},{"n":"robotDescription_nwc_yarp","c":"RobotDescription_nwc_yarp","p":"src/devices/networkWrappers/robotDescription_nwc_yarp","w":"","i":[92],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","/robotDescription_nwc_yarp/rpc",1,"Full port name opened by the device.",""],["","remote","string","","/robotDescription_nws_yarp/rpc",1,"Full port name of the port opened on the server side, to which the device connects to.",""]]},{"n":"robotDescription_nws_yarp","c":"RobotDescription_nws_yarp","p":"src/devices/networkWrappers/robotDescription_nws_yarp","w":"","i":[68,113],"q":[92],"x":[],"s":1,"m":1,"a":1,"r":[["","local","string","","/robotDescriptionServer/rpc",1,"Full port name opened by the device.",""]]},{"n":"robotDescriptionStorage","c":"RobotDescriptionStorage","p":"src/devices/robotDescriptionStorage","w":"","i":[68,92],"q":[92],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"ros2test","c":"yarp_ros2test","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/ros2test.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/ros2test.ini","library":"yarp_ros2test","fields":{"type":"device","name":"ros2test","library":"yarp_ros2test"}}},{"n":"SDLJoypad","c":"SDLJoypad","p":"src/devices/SDLJoypad","w":"JoypadControlServer","i":[59],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"serialport","c":"SerialDeviceDriver","p":"src/devices/serialport","w":"serial","i":[93],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"serialPort_nwc_yarp","c":"SerialPort_nwc_yarp","p":"src/devices/networkWrappers/serialPort_nwc_yarp","w":"","i":[93],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the device connects to.",""]]},{"n":"serialPort_nws_yarp","c":"SerialPort_nws_yarp","p":"src/devices/networkWrappers/serialPort_nws_yarp","w":"serialPort_nws_yarp","i":[68,113],"q":[93],"x":["fakeSerialPort","serialport"],"s":1,"m":1,"a":1,"r":[["","period","double","s","0.02",0,"refresh period of the broadcasted values in s","default 0.02s"],["","name","string","","",1,"Prefix name of the ports opened by the wrapper, e.g. /robotName/Rangefinder2DSensor","Required suffix like '/rpc' will be added by the device"],["","frame_id","string","","",0,"name of the attached frame","Currently not used, reserved for future use"]]},{"n":"SerialServoBoard","c":"SerialServoBoard","p":"src/devices/SerialServoBoard","w":"","i":[80],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"simulatedWorld_nwc_yarp","c":"SimulatedWorld_nwc_yarp","p":"src/devices/networkWrappers/simulatedWorld_nwc_yarp","w":"","i":[94],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the batteryClient device.",""],["","remote","string","","",1,"Full port name of the port opened on the server side, to which the batteryClient connects to.",""],["","carrier","string","","tcp",0,"The carrier used for the connection with the server.",""]]},{"n":"simulatedWorld_nws_ros2","c":"yarp_simulatedWorld_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/simulatedWorld_nws_ros2.ini","w":"simulatedWorld_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/simulatedWorld_nws_ros2.ini","library":"yarp_simulatedWorld_nws_ros2","fields":{"type":"device","name":"simulatedWorld_nws_ros2","library":"yarp_simulatedWorld_nws_ros2","wrapper":"simulatedWorld_nws_ros2"}}},{"n":"simulatedWorld_nws_yarp","c":"SimulatedWorld_nws_yarp","p":"src/devices/networkWrappers/simulatedWorld_nws_yarp","w":"","i":[68,113],"q":[94],"x":[],"s":1,"m":1,"a":1,"r":[["","name","string","","/robotName/battery1",1,"prefix of the ports opened by the device","MUST start with a '/' character. /data:o and /rpc:i is automatically appended by the wrapper at the end"]]},{"n":"speechSynthesizer_nwc_yarp","c":"SpeechSynthesizer_nwc_yarp","p":"src/devices/networkWrappers/speechSynthesizer_nwc_yarp","w":"","i":[97],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the device.",""],["","remote","string","","",1,"Full port name of the port remotely opened by the server, to which this client connects to.",""]]},{"n":"speechSynthesizer_nws_yarp","c":"SpeechSynthesizer_nws_yarp","p":"src/devices/networkWrappers/speechSynthesizer_nws_yarp","w":"","i":[68,113],"q":[97],"x":[],"s":1,"m":1,"a":1,"r":[["","name","string","","/speechSynthesizer_nws",0,"full name of the port opened by the device","MUST start with a '/' character, xxx/text:i, xxx/rpc, xxx/audio:o ports are opened"]]},{"n":"speechTranscription_nwc_yarp","c":"SpeechTranscription_nwc_yarp","p":"src/devices/networkWrappers/speechTranscription_nwc_yarp","w":"","i":[98],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","local","string","","",1,"Full port name opened by the device.",""],["","remote","string","","",1,"Full port name of the port remotely opened by the server, to which this client connects to.",""]]},{"n":"speechTranscription_nws_yarp","c":"SpeechTranscription_nws_yarp","p":"src/devices/networkWrappers/speechTranscription_nws_yarp","w":"","i":[68,113],"q":[98],"x":[],"s":1,"m":1,"a":1,"r":[["","name","string","","/speechTranscription_nws",0,"full name of the port opened by the device","MUST start with a '/' character, xxx/audio:i, xxx/rpc, xxx/texts:o ports are opened"]]},{"n":"test_nop","c":"Nop","p":"src/devices/test_nop","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","period","float","s","1",0,"period of the thread",""]]},{"n":"test_segfault","c":"SegFault","p":"src/devices/test_segfault","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[["","delay","float","s","1",0,"wait time before crash",""]]},{"n":"tripodMotionControl","c":"tripodMotionControl","p":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/tripodMotionControl.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/cer/build/share/CER/plugins/tripodMotionControl.ini","library":"tripodMotionControl","fields":{"type":"device","name":"tripodMotionControl","library":"tripodMotionControl"}}},{"n":"ttsDevice","c":"yarp_ttsDevice","p":"/mnt/data/src/GIT/robotology/yarp-devices-azure-openai/build/share/yarp/plugins/ttsDevice.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-azure-openai/build/share/yarp/plugins/ttsDevice.ini","library":"yarp_ttsDevice","fields":{"type":"device","name":"ttsDevice","library":"yarp_ttsDevice"}}},{"n":"upowerBattery","c":"UpowerBattery","p":"src/devices/upowerBattery","w":"batteryWrapper","i":[9],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"usbCamera","c":"USBCameraDriverRgb","p":"src/devices/usbCamera","w":"frameGrabber_nws_yarp","i":[32,34,36,85,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"usbCameraRaw","c":"USBCameraDriverRaw","p":"src/devices/usbCamera","w":"frameGrabber_nws_yarp","i":[32,36,85,91],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[]},{"n":"virtualAnalogServer","c":"VirtualAnalogWrapper","p":"src/devices/networkWrappers/VirtualAnalogWrapper","w":"virtualAnalogServer","i":[68,113],"q":[110],"x":[],"s":1,"m":1,"a":1,"r":[]},{"n":"whisperDevice","c":"yarp_whisperDevice","p":"/mnt/data/src/GIT/robotology/yarp-devices-azure-openai/build/share/yarp/plugins/whisperDevice.ini","w":"","i":[],"q":[],"x":[],"s":0,"m":0,"a":0,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-azure-openai/build/share/yarp/plugins/whisperDevice.ini","library":"yarp_whisperDevice","fields":{"type":"device","name":"whisperDevice","library":"yarp_whisperDevice"}}},{"n":"wrenchStamped_nws_ros2","c":"yarp_wrenchStamped_nws_ros2","p":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/wrenchStamped_nws_ros2.ini","w":"wrenchStamped_nws_ros2","i":[68,113],"q":[],"x":[],"s":1,"m":1,"a":1,"r":[],"external":true,"manifest":{"path":"/mnt/data/src/GIT/robotology/yarp-devices-ros2/build/share/yarp/plugins/wrenchStamped_nws_ros2.ini","library":"yarp_wrenchStamped_nws_ros2","fields":{"type":"device","name":"wrenchStamped_nws_ros2","library":"yarp_wrenchStamped_nws_ros2","wrapper":"wrenchStamped_nws_ros2"}}}]}</script>
+<script>
+(() => {
+  "use strict";
+
+  const catalog = JSON.parse(document.getElementById("catalog-data").textContent);
+  const byId = (id) => document.getElementById(id);
+  const ifaceNames = catalog.interfaces;
+  const devices = catalog.devices.map((device) => ({
+    ...device,
+    interfaces: device.i.map((index) => ifaceNames[index]),
+    attachInterfaces: device.q.map((index) => ifaceNames[index])
+  }));
+  const deviceByName = new Map(devices.map((device) => [device.n, device]));
+  const PSEUDO_EXTERNAL_INTERFACE = "__external__";
+  const WRAPPER_ALIASES = {
+    AudioRecorderWrapper: "audioRecorder_nws_yarp",
+    batteryWrapper: "battery_nws_yarp",
+    analogServer: "multipleanalogsensorsserver",
+    controlboard: "controlBoard_nws_yarp",
+    controlboard_nws_yarp: "controlBoard_nws_yarp",
+    grabber: "audioRecorder_nws_yarp",
+    inertial: "multipleanalogsensorsserver",
+    JoypadControlServer: "JoypadControl_nws_yarp",
+    rgbdSensor_nws_yarp: "RGBDSensor_nws_yarp",
+    serial: "serialPort_nws_yarp"
+  };
+
+  const state = {
+    items: [],
+    attachTargets: [],
+    externalImports: devices.filter((device) => device.external)
+  };
+
+  const els = {
+    catalogMeta: byId("catalogMeta"),
+    deviceCountBadge: byId("deviceCountBadge"),
+    robotName: byId("robotName"),
+    portPrefix: byId("portPrefix"),
+    buildValue: byId("buildValue"),
+    interfaceSelect: byId("interfaceSelect"),
+    deviceSelect: byId("deviceSelect"),
+    deviceSummary: byId("deviceSummary"),
+    instanceName: byId("instanceName"),
+    paramsHost: byId("paramsHost"),
+    attachHost: byId("attachHost"),
+    addDeviceButton: byId("addDeviceButton"),
+    resetFormButton: byId("resetFormButton"),
+    formStatus: byId("formStatus"),
+    externalCountBadge: byId("externalCountBadge"),
+    chooseYarpDataDirButton: byId("chooseYarpDataDirButton"),
+    chooseManifestFilesButton: byId("chooseManifestFilesButton"),
+    yarpDataDirInput: byId("yarpDataDirInput"),
+    manifestFilesInput: byId("manifestFilesInput"),
+    externalStatus: byId("externalStatus"),
+    externalList: byId("externalList"),
+    deviceList: byId("deviceList"),
+    clearButton: byId("clearButton"),
+    copyButton: byId("copyButton"),
+    downloadButton: byId("downloadButton"),
+    xmlPreview: byId("xmlPreview"),
+    previewStatus: byId("previewStatus")
+  };
+
+  function escapeXml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;");
+  }
+
+  function setStatus(text, type = "") {
+    els.formStatus.textContent = text;
+    els.formStatus.className = `status ${type}`.trim();
+  }
+
+  function option(value, label) {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = label;
+    return opt;
+  }
+
+  function wrapperCanonical(name) {
+    const raw = name || "";
+    if (deviceByName.has(raw)) return raw;
+    if (WRAPPER_ALIASES[raw]) return WRAPPER_ALIASES[raw];
+    const lower = raw.toLowerCase();
+    const match = devices.find((device) => device.n.toLowerCase() === lower);
+    return match ? match.n : raw;
+  }
+
+  function selectedValues(select) {
+    return [...select.selectedOptions].map((opt) => opt.value).filter(Boolean);
+  }
+
+  function setExternalStatus(text, type = "") {
+    els.externalStatus.textContent = text;
+    els.externalStatus.className = `status ${type}`.trim();
+  }
+
+  function refreshCatalogMeta() {
+    const externalCount = state.externalImports.length;
+    const externalText = externalCount ? `, ${externalCount} external imported` : "";
+    const builtInCount = devices.filter((device) => !device.external).length;
+    els.catalogMeta.textContent = `${builtInCount} built-in devices${externalText}, ${ifaceNames.length} interfaces, generated ${catalog.generated}`;
+  }
+
+  function stripQuotes(value) {
+    const trimmed = String(value ?? "").trim();
+    const quoted = trimmed.match(/^(['"])(.*)\1$/);
+    return quoted ? quoted[2] : trimmed;
+  }
+
+  function uniqueValues(values) {
+    return [...new Set(values.filter(Boolean))];
+  }
+
+  function parseInterfaceList(value) {
+    return uniqueValues(
+      stripQuotes(value)
+        .replace(/[()]/g, " ")
+        .split(/[,\s;]+/)
+        .map((name) => name.trim())
+        .filter((name) => ifaceNames.includes(name))
+    );
+  }
+
+  function normalizePath(path) {
+    return String(path || "").replaceAll("\\", "/");
+  }
+
+  function isPluginManifestPath(path) {
+    const normalized = normalizePath(path).toLowerCase();
+    return normalized.endsWith(".ini") && normalized.split("/").includes("plugins");
+  }
+
+  function parsePluginManifest(text, sourcePath = "") {
+    let sectionName = "";
+    const fields = {};
+    for (const rawLine of text.split(/\r?\n/)) {
+      let line = rawLine.trim();
+      if (!line || line.startsWith("#") || line.startsWith(";")) continue;
+      line = line.replace(/\s+[;#].*$/, "").trim();
+      const section = line.match(/^\[plugin\s+([^\]]+)\]$/i);
+      if (section) {
+        sectionName = stripQuotes(section[1]);
+        continue;
+      }
+      const pair = line.match(/^([^\s=]+)(?:\s*=\s*|\s+)(.*)$/);
+      if (!pair) continue;
+      fields[pair[1].toLowerCase()] = stripQuotes(pair[2]);
+    }
+    if ((fields.type || "").toLowerCase() !== "device") return null;
+    const name = fields.name || sectionName;
+    if (!name) return null;
+    return {
+      name,
+      library: fields.library || "",
+      wrapper: fields.wrapper || "",
+      sourcePath: normalizePath(sourcePath),
+      fields
+    };
+  }
+
+  function externalDeviceFromManifest(manifest) {
+    const wrapperName = wrapperCanonical(manifest.wrapper);
+    const wrapperDevice = deviceByName.get(wrapperName);
+    const manifestInterfaces = parseInterfaceList(manifest.fields.interfaces || manifest.fields.interface || "");
+    const inferredInterfaces = wrapperDevice ? wrapperDevice.attachInterfaces : [];
+    const attachInterfaces = parseInterfaceList(
+      manifest.fields.attach_interfaces ||
+      manifest.fields.attachinterfaces ||
+      manifest.fields.viewed_interfaces ||
+      manifest.fields.viewedinterfaces ||
+      ""
+    );
+    const isSelfWrapper = Boolean(manifest.wrapper) && wrapperCanonical(manifest.wrapper) === manifest.name;
+    const canAttach = isSelfWrapper || attachInterfaces.length > 0;
+    const interfaces = uniqueValues([
+      ...manifestInterfaces,
+      ...inferredInterfaces,
+      ...(canAttach ? ["IWrapper", "IMultipleWrapper"] : [])
+    ]);
+    return {
+      n: manifest.name,
+      c: manifest.library || "external plugin",
+      p: manifest.sourcePath || "external manifest",
+      w: manifest.wrapper || "",
+      i: [],
+      q: [],
+      x: [],
+      s: canAttach ? 1 : 0,
+      m: canAttach ? 1 : 0,
+      a: canAttach ? 1 : 0,
+      r: [],
+      interfaces,
+      attachInterfaces,
+      external: true,
+      customParams: [],
+      manifest
+    };
+  }
+
+  async function readManifestFiles(files, onlyPluginFolder) {
+    const manifests = [];
+    let scanned = 0;
+    let rejected = 0;
+    for (const file of files) {
+      const sourcePath = normalizePath(file.webkitRelativePath || file.name);
+      if (!sourcePath.toLowerCase().endsWith(".ini")) continue;
+      if (onlyPluginFolder && !isPluginManifestPath(sourcePath)) continue;
+      scanned += 1;
+      try {
+        const manifest = parsePluginManifest(await file.text(), sourcePath);
+        if (manifest) {
+          manifests.push(manifest);
+        } else {
+          rejected += 1;
+        }
+      } catch {
+        rejected += 1;
+      }
+    }
+    return { manifests, scanned, rejected };
+  }
+
+  async function readManifestDirectory(directoryHandle, prefix = "") {
+    const manifests = [];
+    let scanned = 0;
+    let rejected = 0;
+    for await (const [name, handle] of directoryHandle.entries()) {
+      const path = prefix ? `${prefix}/${name}` : name;
+      if (handle.kind === "directory") {
+        const nested = await readManifestDirectory(handle, path);
+        manifests.push(...nested.manifests);
+        scanned += nested.scanned;
+        rejected += nested.rejected;
+      } else if (handle.kind === "file" && isPluginManifestPath(path)) {
+        scanned += 1;
+        try {
+          const file = await handle.getFile();
+          const manifest = parsePluginManifest(await file.text(), path);
+          if (manifest) {
+            manifests.push(manifest);
+          } else {
+            rejected += 1;
+          }
+        } catch {
+          rejected += 1;
+        }
+      }
+    }
+    return { manifests, scanned, rejected };
+  }
+
+  function syncExternalWrapperLinks() {
+    for (const device of devices.filter((entry) => entry.external)) {
+      const wrapperName = wrapperCanonical(device.w);
+      if (!wrapperName || wrapperName === device.n) continue;
+      const wrapper = deviceByName.get(wrapperName);
+      if (wrapper?.a && !wrapper.x.includes(device.n)) wrapper.x.push(device.n);
+    }
+    for (const wrapper of devices.filter((entry) => entry.external && entry.a)) {
+      for (const device of devices.filter((entry) => entry.external && entry.n !== wrapper.n)) {
+        if (wrapperCanonical(device.w) === wrapper.n && !wrapper.x.includes(device.n)) wrapper.x.push(device.n);
+      }
+    }
+  }
+
+  function renderExternalImports() {
+    const imported = [...state.externalImports].sort((a, b) => a.n.localeCompare(b.n));
+    els.externalCountBadge.textContent = `${imported.length} imported`;
+    els.externalList.replaceChildren();
+    for (const device of imported) {
+      const row = document.createElement("div");
+      row.className = "external-item";
+      const text = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = device.n;
+      const details = document.createElement("small");
+      const ifaces = device.interfaces.length ? device.interfaces.join(", ") : "interfaces not tagged";
+      details.textContent = [device.w ? `wrapper: ${device.w}` : "", ifaces, device.p].filter(Boolean).join(" | ");
+      text.append(title, details);
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = device.a ? "attach" : "device";
+      row.append(text, badge);
+      els.externalList.appendChild(row);
+    }
+  }
+
+  function importManifests(manifests) {
+    let added = 0;
+    let duplicates = 0;
+    for (const manifest of manifests) {
+      if (deviceByName.has(manifest.name)) {
+        duplicates += 1;
+        continue;
+      }
+      const device = externalDeviceFromManifest(manifest);
+      devices.push(device);
+      deviceByName.set(device.n, device);
+      state.externalImports.push(device);
+      added += 1;
+    }
+    if (!added) {
+      renderExternalImports();
+      return { added, duplicates };
+    }
+    syncExternalWrapperLinks();
+    refreshCatalogMeta();
+    const previousDevice = els.deviceSelect.value;
+    fillInterfaceSelect();
+    refreshDeviceSelect();
+    if (previousDevice && [...els.deviceSelect.options].some((opt) => opt.value === previousDevice)) {
+      els.deviceSelect.value = previousDevice;
+      renderSelectedDevice();
+    }
+    renderExternalImports();
+    return { added, duplicates };
+  }
+
+  function manifestStatus(result, stats) {
+    const pieces = [`${stats.added} imported`];
+    if (stats.duplicates) pieces.push(`${stats.duplicates} skipped as already known`);
+    if (result.rejected) pieces.push(`${result.rejected} ignored`);
+    pieces.push(`${result.scanned} manifest${result.scanned === 1 ? "" : "s"} scanned`);
+    return pieces.join(", ");
+  }
+
+  async function importFromFileList(files, onlyPluginFolder) {
+    const selected = [...files];
+    if (!selected.length) return;
+    setExternalStatus("Reading manifests...");
+    const result = await readManifestFiles(selected, onlyPluginFolder);
+    const stats = importManifests(result.manifests);
+    setExternalStatus(manifestStatus(result, stats), stats.added ? "ok" : "");
+  }
+
+  async function chooseYarpDataDir() {
+    if (window.showDirectoryPicker) {
+      try {
+        const handle = await window.showDirectoryPicker();
+        setExternalStatus("Reading manifests...");
+        const result = await readManifestDirectory(handle);
+        const stats = importManifests(result.manifests);
+        setExternalStatus(manifestStatus(result, stats), stats.added ? "ok" : "");
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return;
+      }
+    }
+    els.yarpDataDirInput.click();
+  }
+
+  function selectedDevice() {
+    return deviceByName.get(els.deviceSelect.value) || null;
+  }
+
+  function deviceLabel(device) {
+    const nw = /_nwc_|nwc/i.test(device.n) ? " [nwc]" : /_nws_|nws/i.test(device.n) ? " [nws]" : "";
+    const external = device.external ? " [external]" : "";
+    return `${device.n}${nw}${external} (${device.c || "class unknown"})`;
+  }
+
+  function fillInterfaceSelect() {
+    const previous = els.interfaceSelect.value;
+    const counts = new Map(ifaceNames.map((name) => [name, 0]));
+    for (const device of devices) {
+      for (const iface of device.interfaces) counts.set(iface, (counts.get(iface) || 0) + 1);
+    }
+    els.interfaceSelect.replaceChildren(option("", "Select an interface"));
+    for (const name of ifaceNames) {
+      els.interfaceSelect.appendChild(option(name, `${name} (${counts.get(name) || 0})`));
+    }
+    const importedCount = devices.filter((device) => device.external).length;
+    if (importedCount) {
+      els.interfaceSelect.appendChild(option(PSEUDO_EXTERNAL_INTERFACE, `External imports (${importedCount})`));
+    }
+    if ([...els.interfaceSelect.options].some((opt) => opt.value === previous)) {
+      els.interfaceSelect.value = previous;
+    }
+  }
+
+  function refreshDeviceSelect() {
+    const iface = els.interfaceSelect.value;
+    els.deviceSelect.disabled = !iface;
+    els.deviceSelect.replaceChildren(option("", iface ? "Select a device" : "Select an interface first"));
+    if (!iface) {
+      renderSelectedDevice();
+      return;
+    }
+    const matching = devices
+      .filter((device) => iface === PSEUDO_EXTERNAL_INTERFACE ? device.external : device.interfaces.includes(iface))
+      .sort((a, b) => a.n.localeCompare(b.n));
+    for (const device of matching) els.deviceSelect.appendChild(option(device.n, deviceLabel(device)));
+    els.deviceCountBadge.textContent = `${matching.length} device types`;
+    renderSelectedDevice();
+  }
+
+  function suggestInstanceName(device) {
+    const base = (device?.n || "device").replace(/[^A-Za-z0-9_]/g, "_");
+    let index = state.items.length + 1;
+    let candidate = `${base}_${index}`;
+    const used = new Set(state.items.map((item) => item.name));
+    while (used.has(candidate)) {
+      index += 1;
+      candidate = `${base}_${index}`;
+    }
+    return candidate;
+  }
+
+  function renderSelectedDevice() {
+    const device = selectedDevice();
+    els.paramsHost.replaceChildren();
+    els.attachHost.replaceChildren();
+    els.attachHost.classList.add("hidden");
+    els.addDeviceButton.disabled = !device;
+    state.attachTargets = [];
+    if (!device) {
+      els.deviceSummary.textContent = "";
+      els.instanceName.value = "";
+      return;
+    }
+    els.instanceName.value = suggestInstanceName(device);
+    renderDeviceSummary(device);
+    if (device.external) renderExternalMetadataEditor(device);
+    renderParams(device);
+    renderAttach(device);
+    setStatus("");
+  }
+
+  function renderDeviceSummary(device) {
+    const paramCount = device.r.length;
+    const required = device.r.filter((row) => row[5]).length;
+    const paramText = device.external
+      ? "generated parameters unavailable"
+      : `${paramCount} generated parameters (${required} mandatory)`;
+    const attachText = device.a
+      ? `Attach: ${device.s ? "single" : ""}${device.s && device.m ? ", " : ""}${device.m ? "multiple" : ""}`
+      : "No robotinterface attach method found";
+    els.deviceSummary.textContent = `${device.p} | ${device.interfaces.length} interfaces | ${paramText} | ${attachText}`;
+  }
+
+  function interfaceMultiSelect(selected) {
+    const select = document.createElement("select");
+    select.multiple = true;
+    select.className = "multi-select";
+    const chosen = new Set(selected || []);
+    for (const iface of ifaceNames) {
+      const opt = option(iface, iface);
+      opt.selected = chosen.has(iface);
+      select.appendChild(opt);
+    }
+    return select;
+  }
+
+  function renderExternalMetadataEditor(device) {
+    const heading = document.createElement("div");
+    heading.className = "param-heading";
+    heading.textContent = "External metadata";
+
+    const grid = document.createElement("div");
+    grid.className = "grid-2";
+    const ifaceLabel = document.createElement("label");
+    const ifaceSpan = document.createElement("span");
+    ifaceSpan.textContent = "Implemented interfaces";
+    const ifaceSelect = interfaceMultiSelect(device.interfaces);
+    ifaceLabel.append(ifaceSpan, ifaceSelect);
+
+    const attachIfaceLabel = document.createElement("label");
+    const attachIfaceSpan = document.createElement("span");
+    attachIfaceSpan.textContent = "Attach target interfaces";
+    const attachIfaceSelect = interfaceMultiSelect(device.attachInterfaces);
+    attachIfaceLabel.append(attachIfaceSpan, attachIfaceSelect);
+    grid.append(ifaceLabel, attachIfaceLabel);
+
+    const flags = document.createElement("div");
+    flags.className = "row";
+    const attachLabel = document.createElement("label");
+    attachLabel.className = "checkline";
+    const attach = document.createElement("input");
+    attach.type = "checkbox";
+    attach.checked = Boolean(device.a);
+    const attachText = document.createElement("span");
+    attachText.textContent = "has Attach method";
+    attachLabel.append(attach, attachText);
+
+    const multipleLabel = document.createElement("label");
+    multipleLabel.className = "checkline";
+    const multiple = document.createElement("input");
+    multiple.type = "checkbox";
+    multiple.checked = Boolean(device.m);
+    const multipleText = document.createElement("span");
+    multipleText.textContent = "multiple attach";
+    multipleLabel.append(multiple, multipleText);
+    flags.append(attachLabel, multipleLabel);
+
+    function syncMetadata(rerenderAttach = true) {
+      device.interfaces = selectedValues(ifaceSelect);
+      device.attachInterfaces = selectedValues(attachIfaceSelect);
+      device.a = attach.checked ? 1 : 0;
+      device.s = attach.checked ? 1 : 0;
+      device.m = attach.checked && multiple.checked ? 1 : 0;
+      if (device.a && !device.interfaces.includes("IWrapper")) device.interfaces.push("IWrapper");
+      if (device.m && !device.interfaces.includes("IMultipleWrapper")) device.interfaces.push("IMultipleWrapper");
+      for (const opt of ifaceSelect.options) opt.selected = device.interfaces.includes(opt.value);
+      multiple.disabled = !device.a;
+      attachIfaceSelect.disabled = !device.a;
+      syncExternalWrapperLinks();
+      renderDeviceSummary(device);
+      fillInterfaceSelect();
+      renderExternalImports();
+      if (!rerenderAttach) return;
+      const currentName = els.instanceName.value;
+      els.attachHost.replaceChildren();
+      els.attachHost.classList.add("hidden");
+      state.attachTargets = [];
+      renderAttach(device);
+      els.instanceName.value = currentName;
+    }
+
+    ifaceSelect.addEventListener("change", syncMetadata);
+    attachIfaceSelect.addEventListener("change", syncMetadata);
+    attach.addEventListener("change", syncMetadata);
+    multiple.addEventListener("change", syncMetadata);
+    syncMetadata(false);
+    els.paramsHost.append(heading, grid, flags);
+  }
+
+  function renderCustomParamEditor(device) {
+    if (!device.customParams) device.customParams = [];
+    if (device.external && !device.customParams.length) {
+      device.customParams.push({ group: "", name: "", value: "" });
+    }
+
+    const heading = document.createElement("div");
+    heading.className = "param-heading";
+    heading.textContent = "Manual XML parameters";
+    const list = document.createElement("div");
+    list.className = "stack";
+    const add = document.createElement("button");
+    add.type = "button";
+    add.textContent = "Add parameter";
+
+    function renderRows() {
+      list.replaceChildren();
+      for (const [index, param] of device.customParams.entries()) {
+        const row = document.createElement("div");
+        row.className = "manual-param-row";
+        row.dataset.manualParam = "1";
+
+        const groupLabel = document.createElement("label");
+        const groupSpan = document.createElement("span");
+        groupSpan.textContent = "Group";
+        const groupInput = document.createElement("input");
+        groupInput.dataset.manualGroup = "1";
+        groupInput.value = param.group || "";
+        groupInput.placeholder = "optional";
+        groupInput.addEventListener("input", () => { param.group = groupInput.value; });
+        groupLabel.append(groupSpan, groupInput);
+
+        const nameLabel = document.createElement("label");
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = "Name";
+        const nameInput = document.createElement("input");
+        nameInput.dataset.manualName = "1";
+        nameInput.value = param.name || "";
+        nameInput.placeholder = "param_name";
+        nameInput.addEventListener("input", () => { param.name = nameInput.value; });
+        nameLabel.append(nameSpan, nameInput);
+
+        const valueLabel = document.createElement("label");
+        const valueSpan = document.createElement("span");
+        valueSpan.textContent = "Value";
+        const valueInput = document.createElement("input");
+        valueInput.dataset.manualValue = "1";
+        valueInput.value = param.value || "";
+        valueInput.placeholder = "value";
+        valueInput.addEventListener("input", () => { param.value = valueInput.value; });
+        valueLabel.append(valueSpan, valueInput);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "danger";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", () => {
+          device.customParams.splice(index, 1);
+          renderRows();
+        });
+
+        row.append(groupLabel, nameLabel, valueLabel, remove);
+        list.appendChild(row);
+      }
+    }
+
+    add.addEventListener("click", () => {
+      device.customParams.push({ group: "", name: "", value: "" });
+      renderRows();
+    });
+    renderRows();
+    els.paramsHost.append(heading, list, add);
+  }
+
+  function inputForParam(row, includeInput) {
+    const type = row[2].toLowerCase();
+    let input;
+    if (type === "bool") {
+      input = document.createElement("select");
+      input.appendChild(option("true", "true"));
+      input.appendChild(option("false", "false"));
+      input.value = row[4] === "true" ? "true" : "false";
+    } else {
+      input = document.createElement("input");
+      input.type = "text";
+      input.value = row[4] || "";
+      input.placeholder = row[5] ? "mandatory_value" : "optional_value";
+    }
+    input.dataset.paramInput = "1";
+    input.disabled = includeInput ? !includeInput.checked : false;
+    return input;
+  }
+
+  function renderParams(device) {
+    if (!device.r.length) {
+      const empty = document.createElement("div");
+      empty.className = "device-summary";
+      empty.textContent = "No generated parameter table was found for this device.";
+      els.paramsHost.appendChild(empty);
+    } else {
+      let lastGroup = null;
+      for (const row of device.r) {
+        const group = row[0] || "Ungrouped";
+        if (group !== lastGroup) {
+          const heading = document.createElement("div");
+          heading.className = "param-heading";
+          heading.textContent = group;
+          els.paramsHost.appendChild(heading);
+          lastGroup = group;
+        }
+        const required = Boolean(row[5]);
+        const wrap = document.createElement("div");
+        wrap.className = `param-row ${required ? "" : "optional-off"}`.trim();
+        wrap.dataset.paramName = row[1];
+        wrap.dataset.paramGroup = row[0];
+        const left = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "param-name";
+        const strong = document.createElement("strong");
+        strong.textContent = row[1];
+        const badge = document.createElement("span");
+        badge.className = `badge ${required ? "required" : "optional"}`;
+        badge.textContent = required ? "mandatory" : "optional";
+        name.append(strong, badge);
+        const doc = document.createElement("div");
+        doc.className = "param-doc";
+        doc.textContent = [row[2], row[3] ? `units: ${row[3]}` : "", row[6], row[7]].filter(Boolean).join(" | ");
+        left.append(name, doc);
+        const right = document.createElement("div");
+        let includeInput = null;
+        if (!required) {
+          const check = document.createElement("label");
+          check.className = "checkline";
+          includeInput = document.createElement("input");
+          includeInput.type = "checkbox";
+          includeInput.dataset.includeParam = "1";
+          const text = document.createElement("span");
+          text.textContent = "include";
+          check.append(includeInput, text);
+          right.appendChild(check);
+        }
+        const input = inputForParam(row, includeInput);
+        if (required) input.required = true;
+        if (includeInput) {
+          includeInput.addEventListener("change", () => {
+            input.disabled = !includeInput.checked;
+            wrap.classList.toggle("optional-off", !includeInput.checked);
+          });
+        }
+        right.appendChild(input);
+        wrap.append(left, right);
+        els.paramsHost.appendChild(wrap);
+      }
+    }
+    if (device.external || device.customParams?.length) renderCustomParamEditor(device);
+  }
+
+  function rankedCompatibleInstances(device) {
+    const explicit = new Set(device.x || []);
+    const attachIfaces = new Set(device.attachInterfaces || []);
+    return state.items
+      .map((item) => {
+        const target = deviceByName.get(item.type);
+        const explicitScore = explicit.has(item.type) ? 2 : 0;
+        const shared = target ? target.interfaces.filter((name) => attachIfaces.has(name)) : [];
+        const score = explicitScore || (shared.length ? 1 : 0);
+        return { item, target, score, shared };
+      })
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name));
+  }
+
+  function renderAttach(device) {
+    if (!device.a) return;
+    els.attachHost.classList.remove("hidden");
+    const title = document.createElement("div");
+    title.className = "section-title";
+    const h = document.createElement("h2");
+    h.textContent = "Attach";
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = device.m ? "single or multiple" : "single";
+    title.append(h, badge);
+
+    const enableLine = document.createElement("label");
+    enableLine.className = "checkline";
+    const enable = document.createElement("input");
+    enable.type = "checkbox";
+    enable.id = "attachEnabled";
+    const enableText = document.createElement("span");
+    enableText.textContent = "generate startup attach and shutdown detach actions";
+    enableLine.append(enable, enableText);
+
+    const controls = document.createElement("div");
+    controls.className = "stack hidden";
+    controls.id = "attachControls";
+
+    const candidates = rankedCompatibleInstances(device);
+    const info = document.createElement("div");
+    info.className = "device-summary";
+    const viewed = device.attachInterfaces.length ? `Viewed interfaces: ${device.attachInterfaces.join(", ")}` : "Viewed interfaces: not detected";
+    const compatibleTypes = device.x.length ? `Wrapper hints: ${device.x.slice(0, 10).join(", ")}${device.x.length > 10 ? " ..." : ""}` : "Wrapper hints: none";
+    info.textContent = `${viewed} | ${compatibleTypes}`;
+
+    const modeRow = document.createElement("div");
+    modeRow.className = "grid-2";
+    const modeLabel = document.createElement("label");
+    const modeSpan = document.createElement("span");
+    modeSpan.textContent = "Attach mode";
+    const mode = document.createElement("select");
+    mode.id = "attachMode";
+    mode.appendChild(option("single", "single target"));
+    if (device.m) mode.appendChild(option("multiple", "multiple targets"));
+    modeLabel.append(modeSpan, mode);
+    modeRow.appendChild(modeLabel);
+
+    const singleLabel = document.createElement("label");
+    const singleSpan = document.createElement("span");
+    singleSpan.textContent = "Target instance";
+    const singleSelect = document.createElement("select");
+    singleSelect.id = "singleAttachTarget";
+    singleLabel.append(singleSpan, singleSelect);
+    modeRow.appendChild(singleLabel);
+
+    const multiBox = document.createElement("div");
+    multiBox.className = "stack hidden";
+    multiBox.id = "multiAttachBox";
+    const addRow = document.createElement("div");
+    addRow.className = "attach-target";
+    const multiTargetLabel = document.createElement("label");
+    const multiTargetSpan = document.createElement("span");
+    multiTargetSpan.textContent = "Target instance";
+    const multiTargetSelect = document.createElement("select");
+    multiTargetSelect.id = "multiAttachTarget";
+    multiTargetLabel.append(multiTargetSpan, multiTargetSelect);
+    const keyLabel = document.createElement("label");
+    const keySpan = document.createElement("span");
+    keySpan.textContent = "Network key";
+    const keyInput = document.createElement("input");
+    keyInput.id = "multiAttachKey";
+    keyInput.placeholder = "attached_device";
+    keyLabel.append(keySpan, keyInput);
+    const addTarget = document.createElement("button");
+    addTarget.type = "button";
+    addTarget.textContent = "Add target";
+    addRow.append(multiTargetLabel, keyLabel, addTarget);
+    const chosen = document.createElement("div");
+    chosen.className = "attach-list";
+    chosen.id = "multiAttachList";
+    multiBox.append(addRow, chosen);
+
+    const noTargets = document.createElement("div");
+    noTargets.className = "status";
+    noTargets.textContent = candidates.length ? "" : "Add a compatible device instance before adding this attach action.";
+
+    function fillTargetSelect(select) {
+      select.replaceChildren(option("", candidates.length ? "Select target" : "No compatible instances yet"));
+      for (const entry of candidates) {
+        const suffix = entry.score === 2 ? "wrapper hint" : entry.shared.join(", ");
+        select.appendChild(option(entry.item.name, `${entry.item.name} (${entry.item.type}; ${suffix})`));
+      }
+    }
+
+    function renderMultiList() {
+      chosen.replaceChildren();
+      for (const [index, target] of state.attachTargets.entries()) {
+        const row = document.createElement("div");
+        row.className = "attach-target";
+        const key = document.createElement("input");
+        key.value = target.key;
+        key.addEventListener("input", () => { target.key = key.value; refreshPreview(); });
+        const name = document.createElement("input");
+        name.value = target.device;
+        name.disabled = true;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", () => {
+          state.attachTargets.splice(index, 1);
+          renderMultiList();
+          refreshPreview();
+        });
+        row.append(key, name, remove);
+        chosen.appendChild(row);
+      }
+    }
+
+    function syncMode() {
+      const isMultiple = mode.value === "multiple";
+      singleLabel.classList.toggle("hidden", isMultiple);
+      multiBox.classList.toggle("hidden", !isMultiple);
+      refreshPreview();
+    }
+
+    fillTargetSelect(singleSelect);
+    fillTargetSelect(multiTargetSelect);
+    multiTargetSelect.addEventListener("change", () => {
+      keyInput.value = multiTargetSelect.value || "";
+    });
+    addTarget.addEventListener("click", () => {
+      const value = multiTargetSelect.value;
+      if (!value) return;
+      if (!state.attachTargets.some((target) => target.device === value)) {
+        state.attachTargets.push({ device: value, key: keyInput.value || value });
+        renderMultiList();
+      }
+      refreshPreview();
+    });
+    enable.addEventListener("change", () => {
+      controls.classList.toggle("hidden", !enable.checked);
+      refreshPreview();
+    });
+    mode.addEventListener("change", syncMode);
+    singleSelect.addEventListener("change", refreshPreview);
+    controls.append(info, modeRow, multiBox, noTargets);
+    els.attachHost.append(title, enableLine, controls);
+    syncMode();
+  }
+
+  function collectParams() {
+    const params = [];
+    const rows = els.paramsHost.querySelectorAll(".param-row");
+    for (const row of rows) {
+      const include = row.querySelector("[data-include-param]");
+      const input = row.querySelector("[data-param-input]");
+      const required = !include;
+      if (!input) continue;
+      if (!required && !include.checked) continue;
+      const value = input.value.trim();
+      if (required && !value) {
+        input.focus();
+        throw new Error(`Missing mandatory parameter: ${row.dataset.paramName}`);
+      }
+      params.push({ group: row.dataset.paramGroup || "", name: row.dataset.paramName, value });
+    }
+    const manualRows = els.paramsHost.querySelectorAll("[data-manual-param]");
+    for (const row of manualRows) {
+      const group = row.querySelector("[data-manual-group]")?.value.trim() || "";
+      const nameInput = row.querySelector("[data-manual-name]");
+      const name = nameInput?.value.trim() || "";
+      const value = row.querySelector("[data-manual-value]")?.value.trim() || "";
+      if (!group && !name && !value) continue;
+      if (!name) {
+        nameInput?.focus();
+        throw new Error("Manual parameter name is mandatory.");
+      }
+      params.push({ group, name, value });
+    }
+    return params;
+  }
+
+  function collectAttach() {
+    const enabled = byId("attachEnabled");
+    if (!enabled || !enabled.checked) return null;
+    const mode = byId("attachMode")?.value || "single";
+    if (mode === "multiple") {
+      if (!state.attachTargets.length) throw new Error("Add at least one attach target.");
+      return { mode, targets: state.attachTargets.map((target) => ({ ...target })) };
+    }
+    const target = byId("singleAttachTarget")?.value || "";
+    if (!target) throw new Error("Select an attach target.");
+    return { mode: "single", target };
+  }
+
+  function addDevice() {
+    const device = selectedDevice();
+    if (!device) return;
+    const name = els.instanceName.value.trim();
+    if (!name) {
+      els.instanceName.focus();
+      setStatus("XML instance name is mandatory.", "error");
+      return;
+    }
+    if (state.items.some((item) => item.name === name)) {
+      els.instanceName.focus();
+      setStatus("XML instance names must be unique.", "error");
+      return;
+    }
+    try {
+      const params = collectParams();
+      const attach = collectAttach();
+      state.items.push({ name, type: device.n, className: device.c, params, attach });
+      renderDeviceList();
+      refreshPreview();
+      setStatus(`Added ${name}.`, "ok");
+      renderSelectedDevice();
+    } catch (err) {
+      setStatus(err.message, "error");
+    }
+  }
+
+  function renderDeviceList() {
+    els.deviceList.replaceChildren();
+    if (!state.items.length) {
+      const empty = document.createElement("div");
+      empty.className = "device-summary";
+      empty.textContent = "No devices added yet.";
+      els.deviceList.appendChild(empty);
+      return;
+    }
+    state.items.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "device-item";
+      const text = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.name;
+      const sub = document.createElement("small");
+      sub.textContent = `${item.type}${item.attach ? " | attach" : ""}`;
+      text.append(title, sub);
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "danger";
+      remove.textContent = "Remove";
+      remove.addEventListener("click", () => {
+        state.items.splice(index, 1);
+        renderDeviceList();
+        renderSelectedDevice();
+        refreshPreview();
+      });
+      row.append(text, remove);
+      els.deviceList.appendChild(row);
+    });
+  }
+
+  function segmentFor(item, indent = "    ") {
+    const lines = [];
+    lines.push(`${indent}<device name="${escapeXml(item.name)}" type="${escapeXml(item.type)}">`);
+    const plain = item.params.filter((param) => !param.group);
+    const grouped = item.params.filter((param) => param.group);
+    for (const param of plain) {
+      lines.push(`${indent}  <param name="${escapeXml(param.name)}"> ${escapeXml(param.value)} </param>`);
+    }
+    const groups = [];
+    for (const param of grouped) {
+      let group = groups.find((entry) => entry.name === param.group);
+      if (!group) {
+        group = { name: param.group, params: [] };
+        groups.push(group);
+      }
+      group.params.push(param);
+    }
+    for (const group of groups) {
+      lines.push(`${indent}  <group name="${escapeXml(group.name)}">`);
+      for (const param of group.params) {
+        lines.push(`${indent}    <param name="${escapeXml(param.name)}"> ${escapeXml(param.value)} </param>`);
+      }
+      lines.push(`${indent}  </group>`);
+    }
+    if (item.attach) {
+      lines.push(`${indent}  <action phase="startup" level="5" type="attach">`);
+      if (item.attach.mode === "multiple") {
+        lines.push(`${indent}    <paramlist name="networks">`);
+        for (const target of item.attach.targets) {
+          lines.push(`${indent}      <elem name="${escapeXml(target.key)}"> ${escapeXml(target.device)} </elem>`);
+        }
+        lines.push(`${indent}    </paramlist>`);
+      } else {
+        lines.push(`${indent}    <param name="device"> ${escapeXml(item.attach.target)} </param>`);
+      }
+      lines.push(`${indent}  </action>`);
+      lines.push(`${indent}  <action phase="shutdown" level="5" type="detach" />`);
+    }
+    lines.push(`${indent}</device>`);
+    return lines.join("\n");
+  }
+
+  function buildXml() {
+    const robotName = els.robotName.value.trim() || "robotinterfaceExample";
+    const portPrefix = els.portPrefix.value.trim();
+    const build = els.buildValue.value.trim() || "0";
+    const attrs = [`name="${escapeXml(robotName)}"`, `build="${escapeXml(build)}"`, `xmlns:xi="http://www.w3.org/2001/XInclude"`];
+    if (portPrefix) attrs.splice(1, 0, `portprefix="${escapeXml(portPrefix)}"`);
+    const lines = [
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>",
+      "<!DOCTYPE robot PUBLIC \"-//YARP//DTD yarprobotinterface 3.0//EN\" \"http://www.yarp.it/DTD/yarprobotinterfaceV3.0.dtd\">",
+      "",
+      `<robot ${attrs.join(" ")}>`,
+      "  <devices>"
+    ];
+    if (state.items.length) {
+      for (const item of state.items) lines.push(segmentFor(item));
+    }
+    lines.push("  </devices>", "</robot>", "");
+    return lines.join("\n");
+  }
+
+  function refreshPreview() {
+    els.xmlPreview.value = buildXml();
+    els.previewStatus.textContent = `${state.items.length} device${state.items.length === 1 ? "" : "s"} in document`;
+  }
+
+  function copyXml() {
+    els.xmlPreview.focus();
+    els.xmlPreview.select();
+    const text = els.xmlPreview.value;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        els.previewStatus.textContent = "Copied.";
+      }).catch(() => document.execCommand("copy"));
+    } else {
+      document.execCommand("copy");
+      els.previewStatus.textContent = "Copied.";
+    }
+  }
+
+  function downloadXml() {
+    const robotName = (els.robotName.value.trim() || "yarprobotinterface").replace(/[^A-Za-z0-9_.-]/g, "_");
+    const blob = new Blob([els.xmlPreview.value], { type: "application/xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${robotName}.xml`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function init() {
+    refreshCatalogMeta();
+    fillInterfaceSelect();
+    renderExternalImports();
+    renderDeviceList();
+    refreshPreview();
+    els.interfaceSelect.addEventListener("change", refreshDeviceSelect);
+    els.deviceSelect.addEventListener("change", renderSelectedDevice);
+    els.addDeviceButton.addEventListener("click", addDevice);
+    els.resetFormButton.addEventListener("click", renderSelectedDevice);
+    els.clearButton.addEventListener("click", () => {
+      state.items = [];
+      renderDeviceList();
+      renderSelectedDevice();
+      refreshPreview();
+      setStatus("Cleared.");
+    });
+    for (const input of [els.robotName, els.portPrefix, els.buildValue]) {
+      input.addEventListener("input", refreshPreview);
+    }
+    els.chooseYarpDataDirButton.addEventListener("click", chooseYarpDataDir);
+    els.chooseManifestFilesButton.addEventListener("click", () => els.manifestFilesInput.click());
+    els.yarpDataDirInput.addEventListener("change", async () => {
+      try {
+        await importFromFileList(els.yarpDataDirInput.files, true);
+      } catch (err) {
+        setExternalStatus(`Could not read manifests: ${err.message}`, "error");
+      } finally {
+        els.yarpDataDirInput.value = "";
+      }
+    });
+    els.manifestFilesInput.addEventListener("change", async () => {
+      try {
+        await importFromFileList(els.manifestFilesInput.files, false);
+      } catch (err) {
+        setExternalStatus(`Could not read manifests: ${err.message}`, "error");
+      } finally {
+        els.manifestFilesInput.value = "";
+      }
+    });
+    els.copyButton.addEventListener("click", copyXml);
+    els.downloadButton.addEventListener("click", downloadXml);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
