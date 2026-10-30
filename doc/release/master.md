@@ -24,6 +24,18 @@ A (partial) list of bug fixed and issues resolved in this release can be found
 * Several methods of `MultipleAnalogSensor` interfaces migrated from returning `bool` to returning `yarp::dev::ReturnValue`
 * New method for `ISpeechSynthesizer`: `getAvailableVoices` to get a list of the available voices names for the current language
 
+### libYARP_manager
+
+* Added application parameters: an application can use `$PAR{name}` or `$PAR{name=default}` placeholders and the applications
+  embedding it can set their values with `<app-param name="name">value</app-param>`, so the same application can be embedded
+  several times with different values. See the yarpmanager documentation for details.
+* Fixed `Application::clear()` not clearing the arbitrators, which leaked from one application file to the next when loading a directory.
+
+### yarpmanager
+
+* The builder warns before saving an application that uses application parameters, and shows an error when an embedded
+  application cannot be added.
+
 ### thrift generator
 
 * Updated thrift generator to use `yarp.api.include` also in `enums` when required.
